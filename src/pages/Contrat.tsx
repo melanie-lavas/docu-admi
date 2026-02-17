@@ -20,8 +20,9 @@ const ContratPage = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [frequency, setFrequency] = useState("Au besoin");
+  const [nbPassages, setNbPassages] = useState("22");
   const [totalPrice, setTotalPrice] = useState("");
+  const [paymentOption, setPaymentOption] = useState<"" | "A" | "B">("");
   const [conditions, setConditions] = useState(
     `1. L'entrepreneur s'engage à fournir les services décrits ci-dessus selon les termes convenus.\n2. Le client s'engage à payer le montant total convenu selon les modalités établies.\n3. Tout travail additionnel non prévu au contrat fera l'objet d'une soumission séparée.\n4. Ce contrat peut être résilié par l'une ou l'autre des parties avec un préavis écrit de 30 jours.\n5. L'entrepreneur n'est pas responsable des dommages causés par des conditions météorologiques extrêmes.`
   );
@@ -74,10 +75,13 @@ const ContratPage = () => {
               <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="mt-1" />
             </div>
             <div>
-              <Label className="text-muted-foreground text-xs">Fréquence</Label>
-              <Input value={frequency} onChange={(e) => setFrequency(e.target.value)} className="mt-1" />
+              <Label className="text-muted-foreground text-xs">Nombre de passages</Label>
+              <Input value={nbPassages} onChange={(e) => setNbPassages(e.target.value)} className="mt-1" />
             </div>
           </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            Le Prestataire effectuera {nbPassages} passages pendant la période contractualisée, répartis régulièrement en fonction des besoins de la pelouse et des conditions climatiques. La fréquence peut être ajustée par le Prestataire selon les recommandations agronomiques.
+          </p>
         </div>
 
         {/* Services */}
@@ -103,7 +107,7 @@ const ContratPage = () => {
           <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
             Montant convenu
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-4">
             <Input
               value={totalPrice}
               onChange={(e) => setTotalPrice(e.target.value)}
@@ -111,6 +115,33 @@ const ContratPage = () => {
               className="w-40 text-right"
             />
             <span className="text-muted-foreground text-sm">$ (avant taxes)</span>
+          </div>
+
+          {/* Payment Options */}
+          <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">
+            Options de paiement
+          </h4>
+          <div className="space-y-3">
+            <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
+              <Checkbox
+                checked={paymentOption === "A"}
+                onCheckedChange={() => setPaymentOption(paymentOption === "A" ? "" : "A")}
+              />
+              <div className="text-sm">
+                <span className="font-semibold text-foreground">Option A — Paiement intégral</span>
+                <p className="text-muted-foreground text-xs mt-0.5">Règlement unique avant le 1er mai 2026</p>
+              </div>
+            </label>
+            <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
+              <Checkbox
+                checked={paymentOption === "B"}
+                onCheckedChange={() => setPaymentOption(paymentOption === "B" ? "" : "B")}
+              />
+              <div className="text-sm">
+                <span className="font-semibold text-foreground">Option B — 2 versements égaux</span>
+                <p className="text-muted-foreground text-xs mt-0.5">1er versement le 15 avril 2026, 2e versement le 15 août 2026</p>
+              </div>
+            </label>
           </div>
         </div>
 

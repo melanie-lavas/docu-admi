@@ -10,9 +10,12 @@ export const companyInfo = {
     "Tonte de pelouse",
     "Taille de haies",
     "Élagage",
+    "Terreautage",
+    "Aération du sol",
     "Nettoyage de gouttières",
     "Ramassage de feuilles",
-    "Nettoyage de stationnements & pavés",
+    "Entretien de plates bandes",
+    "Nettoyage de stationnements et pavés",
     "Déneigement manuel et toitures",
   ],
 };
