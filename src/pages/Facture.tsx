@@ -1,0 +1,93 @@
+import { useState } from "react";
+import DocumentHeader from "@/components/DocumentHeader";
+import ClientSection from "@/components/ClientSection";
+import LineItemsTable from "@/components/LineItemsTable";
+import DocumentFooter from "@/components/DocumentFooter";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { emptyClient, createLineItem } from "@/lib/companyInfo";
+import { Printer, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import type { ClientInfo, LineItem } from "@/lib/companyInfo";
+
+const FacturePage = () => {
+  const navigate = useNavigate();
+  const [client, setClient] = useState<ClientInfo>({ ...emptyClient });
+  const [items, setItems] = useState<LineItem[]>([createLineItem()]);
+  const [docNumber, setDocNumber] = useState("F-001");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [dueDate, setDueDate] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("virement");
+  const [notes, setNotes] = useState("Paiement dû dans les 30 jours suivant la réception de la facture.");
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Toolbar */}
+      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-6 py-3 flex items-center justify-between">
+        <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
+          <ArrowLeft className="h-4 w-4" /> Retour
+        </Button>
+        <div className="flex gap-3 items-center">
+          <div className="flex items-center gap-2">
+            <Label className="text-xs text-muted-foreground">N°</Label>
+            <Input value={docNumber} onChange={(e) => setDocNumber(e.target.value)} className="w-28 h-8 text-sm" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="text-xs text-muted-foreground">Date</Label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-36 h-8 text-sm" />
+          </div>
+          <Button onClick={() => window.print()} className="gap-2">
+            <Printer className="h-4 w-4" /> Imprimer
+          </Button>
+        </div>
+      </div>
+
+      {/* Document */}
+      <div className="max-w-4xl mx-auto p-8 print-page">
+        <DocumentHeader documentType="Facture" documentNumber={docNumber} date={date} />
+        <ClientSection client={client} onChange={setClient} />
+        <LineItemsTable items={items} onChange={setItems} showTaxes={true} />
+
+        {/* Payment info */}
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <Label className="text-xs text-muted-foreground">Date d'échéance</Label>
+            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="mt-1 h-9 text-sm" />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Mode de paiement</Label>
+            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+              <SelectTrigger className="mt-1 h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="virement">Virement Interac</SelectItem>
+                <SelectItem value="cheque">Chèque</SelectItem>
+                <SelectItem value="comptant">Comptant</SelectItem>
+                <SelectItem value="autre">Autre</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div className="mb-6">
+          <Label className="text-xs text-muted-foreground">Notes</Label>
+          <Textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            className="mt-1 text-sm"
+          />
+        </div>
+
+        <DocumentFooter />
+      </div>
+    </div>
+  );
+};
+
+export default FacturePage;
