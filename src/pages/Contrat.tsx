@@ -34,27 +34,27 @@ const ContratPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Toolbar */}
-      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-6 py-3 flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
+      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex flex-wrap items-center justify-between gap-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1">
           <ArrowLeft className="h-4 w-4" /> Retour
         </Button>
-        <div className="flex gap-3 items-center">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex items-center gap-1">
             <Label className="text-xs text-muted-foreground">N°</Label>
-            <Input value={docNumber} onChange={(e) => setDocNumber(e.target.value)} className="w-28 h-8 text-sm" />
+            <Input value={docNumber} onChange={(e) => setDocNumber(e.target.value)} className="w-20 sm:w-28 h-8 text-sm" />
           </div>
-          <div className="flex items-center gap-2">
-            <Label className="text-xs text-muted-foreground">Date</Label>
-            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-36 h-8 text-sm" />
+          <div className="flex items-center gap-1">
+            <Label className="text-xs text-muted-foreground hidden sm:inline">Date</Label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-32 sm:w-36 h-8 text-sm" />
           </div>
-          <Button onClick={() => window.print()} className="gap-2">
-            <Printer className="h-4 w-4" /> Imprimer
+          <Button size="sm" onClick={() => window.print()} className="gap-1">
+            <Printer className="h-4 w-4" /> <span className="hidden sm:inline">Imprimer</span>
           </Button>
         </div>
       </div>
 
       {/* Document */}
-      <div className="max-w-4xl mx-auto p-8 print-page">
+      <div className="max-w-4xl mx-auto p-4 sm:p-8 print-page">
         <DocumentHeader documentType="Contrat de Service" documentNumber={docNumber} date={date} />
 
         {/* Client Section - Blank lines for handwriting */}
@@ -75,7 +75,7 @@ const ContratPage = () => {
               <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Ville :</span>
               <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
             </div>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="flex items-end gap-2">
                 <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Téléphone :</span>
                 <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
@@ -93,7 +93,7 @@ const ContratPage = () => {
           <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
             Période du contrat
           </h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <Label className="text-muted-foreground text-xs">Date de début</Label>
               <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="mt-1" />
@@ -117,7 +117,7 @@ const ContratPage = () => {
           <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
             Services inclus
           </h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {companyInfo.services.map((service) => (
               <label key={service} className="flex items-center gap-2 text-sm cursor-pointer">
                 <Checkbox

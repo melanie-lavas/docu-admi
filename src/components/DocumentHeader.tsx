@@ -11,15 +11,15 @@ const DocumentHeader = ({ documentType, documentNumber, date }: DocumentHeaderPr
   return (
     <div className="mb-6">
       {/* Company Banner */}
-      <div className="document-header-gradient rounded-t-lg p-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <img src={logoEmj} alt="Logo E.M.J" className="w-20 h-20 rounded-lg object-cover" />
+      <div className="document-header-gradient rounded-t-lg p-4 sm:p-6 flex flex-col sm:flex-row items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <img src={logoEmj} alt="Logo E.M.J" className="w-14 h-14 sm:w-20 sm:h-20 rounded-lg object-cover" />
           <div className="text-primary-foreground">
-            <h1 className="text-2xl font-display font-bold">{companyInfo.name}</h1>
-            <p className="text-sm opacity-90">{companyInfo.subtitle}</p>
+            <h1 className="text-lg sm:text-2xl font-display font-bold">{companyInfo.name}</h1>
+            <p className="text-xs sm:text-sm opacity-90">{companyInfo.subtitle}</p>
           </div>
         </div>
-        <div className="text-primary-foreground text-right text-sm">
+        <div className="text-primary-foreground text-center sm:text-right text-xs sm:text-sm">
           <p className="font-semibold">{companyInfo.owner}, {companyInfo.title}</p>
           <p>N.E.Q. {companyInfo.neq}</p>
           <p>📞 {companyInfo.phone}</p>
@@ -28,11 +28,11 @@ const DocumentHeader = ({ documentType, documentNumber, date }: DocumentHeaderPr
       </div>
 
       {/* Document Title Bar */}
-      <div className="bg-secondary border border-t-0 border-border rounded-b-lg px-6 py-3 flex justify-between items-center">
-        <h2 className="text-xl font-display font-bold text-foreground uppercase tracking-wide">
+      <div className="bg-secondary border border-t-0 border-border rounded-b-lg px-4 sm:px-6 py-2 sm:py-3 flex flex-col sm:flex-row justify-between items-center gap-1">
+        <h2 className="text-base sm:text-xl font-display font-bold text-foreground uppercase tracking-wide">
           {documentType}
         </h2>
-        <div className="flex gap-6 text-sm text-muted-foreground">
+        <div className="flex gap-3 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
           {documentNumber && (
             <span>N° <strong className="text-foreground">{documentNumber}</strong></span>
           )}
