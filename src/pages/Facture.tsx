@@ -8,10 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { emptyClient, createLineItem } from "@/lib/companyInfo";
+import { Checkbox } from "@/components/ui/checkbox";
+import { emptyClient, createLineItem, companyInfo } from "@/lib/companyInfo";
 import { Printer, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { ClientInfo, LineItem } from "@/lib/companyInfo";
+import signatureImg from "@/assets/signature-max.png";
 
 const FacturePage = () => {
   const navigate = useNavigate();
@@ -21,7 +23,14 @@ const FacturePage = () => {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [dueDate, setDueDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("virement");
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("Paiement dû dans les 30 jours suivant la réception de la facture.");
+
+  const toggleService = (service: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,6 +58,25 @@ const FacturePage = () => {
       <div className="max-w-4xl mx-auto p-8 print-page">
         <DocumentHeader documentType="Facture" documentNumber={docNumber} date={date} />
         <ClientSection client={client} onChange={setClient} />
+
+        {/* Services */}
+        <div className="border border-border rounded-lg p-5 mb-6">
+          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+            Services
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {companyInfo.services.map((service) => (
+              <label key={service} className="flex items-center gap-2 text-sm cursor-pointer">
+                <Checkbox
+                  checked={selectedServices.includes(service)}
+                  onCheckedChange={() => toggleService(service)}
+                />
+                {service}
+              </label>
+            ))}
+          </div>
+        </div>
+
         <LineItemsTable items={items} onChange={setItems} showTaxes={true} />
 
         {/* Payment info */}
@@ -82,6 +110,22 @@ const FacturePage = () => {
             rows={3}
             className="mt-1 text-sm"
           />
+        </div>
+
+        {/* Signatures */}
+        <div className="grid grid-cols-2 gap-8 mt-12">
+          <div>
+            <img src={signatureImg} alt="Signature Maxime Jutras" className="h-24 mx-auto mb-1 object-contain" />
+            <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
+              Signature de l'entrepreneur
+            </div>
+          </div>
+          <div>
+            <div className="h-24 mb-1"></div>
+            <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
+              Signature du client
+            </div>
+          </div>
         </div>
 
         <DocumentFooter />

@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { emptyClient, createLineItem } from "@/lib/companyInfo";
+import { Checkbox } from "@/components/ui/checkbox";
+import { emptyClient, createLineItem, companyInfo } from "@/lib/companyInfo";
 import { Printer, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { ClientInfo, LineItem } from "@/lib/companyInfo";
+import signatureImg from "@/assets/signature-max.png";
 
 const SoumissionPage = () => {
   const navigate = useNavigate();
@@ -18,8 +20,14 @@ const SoumissionPage = () => {
   const [items, setItems] = useState<LineItem[]>([createLineItem()]);
   const [docNumber, setDocNumber] = useState("S-001");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [validUntil, setValidUntil] = useState("");
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("Cette soumission est valide pour 30 jours à compter de la date d'émission.");
+
+  const toggleService = (service: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,18 +55,26 @@ const SoumissionPage = () => {
       <div className="max-w-4xl mx-auto p-8 print-page">
         <DocumentHeader documentType="Soumission" documentNumber={docNumber} date={date} />
         <ClientSection client={client} onChange={setClient} />
-        <LineItemsTable items={items} onChange={setItems} />
 
-        {/* Validity */}
-        <div className="no-print flex items-center gap-4 mb-4">
-          <Label className="text-xs text-muted-foreground whitespace-nowrap">Valide jusqu'au</Label>
-          <Input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="w-44 h-8 text-sm" />
+        {/* Services */}
+        <div className="border border-border rounded-lg p-5 mb-6">
+          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+            Services
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {companyInfo.services.map((service) => (
+              <label key={service} className="flex items-center gap-2 text-sm cursor-pointer">
+                <Checkbox
+                  checked={selectedServices.includes(service)}
+                  onCheckedChange={() => toggleService(service)}
+                />
+                {service}
+              </label>
+            ))}
+          </div>
         </div>
-        {validUntil && (
-          <p className="text-sm text-muted-foreground mb-4 print-only hidden">
-            Soumission valide jusqu'au {new Date(validUntil).toLocaleDateString("fr-CA")}
-          </p>
-        )}
+
+        <LineItemsTable items={items} onChange={setItems} />
 
         {/* Notes */}
         <div className="mb-6">
@@ -71,13 +87,19 @@ const SoumissionPage = () => {
           />
         </div>
 
-        {/* Signature */}
+        {/* Signatures */}
         <div className="grid grid-cols-2 gap-8 mt-12">
-          <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
-            Signature de l'entrepreneur
+          <div>
+            <img src={signatureImg} alt="Signature Maxime Jutras" className="h-24 mx-auto mb-1 object-contain" />
+            <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
+              Signature de l'entrepreneur
+            </div>
           </div>
-          <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
-            Signature du client
+          <div>
+            <div className="h-24 mb-1"></div>
+            <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
+              Signature du client
+            </div>
           </div>
         </div>
 

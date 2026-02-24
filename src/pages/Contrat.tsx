@@ -1,20 +1,18 @@
 import { useState } from "react";
 import DocumentHeader from "@/components/DocumentHeader";
-import ClientSection from "@/components/ClientSection";
 import DocumentFooter from "@/components/DocumentFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { emptyClient, companyInfo } from "@/lib/companyInfo";
+import { companyInfo } from "@/lib/companyInfo";
 import { Printer, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { ClientInfo } from "@/lib/companyInfo";
+import signatureImg from "@/assets/signature-max.png";
 
 const ContratPage = () => {
   const navigate = useNavigate();
-  const [client, setClient] = useState<ClientInfo>({ ...emptyClient });
   const [docNumber, setDocNumber] = useState("C-001");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [startDate, setStartDate] = useState("");
@@ -58,7 +56,37 @@ const ContratPage = () => {
       {/* Document */}
       <div className="max-w-4xl mx-auto p-8 print-page">
         <DocumentHeader documentType="Contrat de Service" documentNumber={docNumber} date={date} />
-        <ClientSection client={client} onChange={setClient} />
+
+        {/* Client Section - Blank lines for handwriting */}
+        <div className="border border-border rounded-lg p-5 mb-6">
+          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+            Informations du client
+          </h3>
+          <div className="space-y-4 text-sm">
+            <div className="flex items-end gap-2">
+              <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Nom / Entreprise :</span>
+              <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+            </div>
+            <div className="flex items-end gap-2">
+              <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Adresse :</span>
+              <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+            </div>
+            <div className="flex items-end gap-2">
+              <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Ville :</span>
+              <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="flex items-end gap-2">
+                <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Téléphone :</span>
+                <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+              </div>
+              <div className="flex items-end gap-2">
+                <span className="text-muted-foreground whitespace-nowrap min-w-[80px]">Courriel :</span>
+                <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Contract Period */}
         <div className="border border-border rounded-lg p-5 mb-6">
@@ -159,12 +187,14 @@ const ContratPage = () => {
         {/* Signatures */}
         <div className="grid grid-cols-2 gap-8 mt-12">
           <div>
+            <img src={signatureImg} alt="Signature Maxime Jutras" className="h-24 mx-auto mb-1 object-contain" />
             <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
               Signature de l'entrepreneur
             </div>
             <p className="text-center text-xs text-muted-foreground mt-1">{companyInfo.owner}</p>
           </div>
           <div>
+            <div className="h-24 mb-1"></div>
             <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
               Signature du client
             </div>
