@@ -14,7 +14,7 @@ export const companyInfo = {
     "Aération du sol",
     "Nettoyage de gouttières",
     "Ramassage de feuilles",
-    "Entretien de plates bandes",
+    "Entretien de plates-bandes",
     "Nettoyage de stationnements et pavés",
     "Déneigement manuel et toitures",
     "Ouverture de terrain",
