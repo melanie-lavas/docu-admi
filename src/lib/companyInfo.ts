@@ -17,6 +17,9 @@ export const companyInfo = {
     "Entretien de plates bandes",
     "Nettoyage de stationnements et pavés",
     "Déneigement manuel et toitures",
+    "Ouverture de terrain",
+    "Fermeture de terrain",
+    "Autres",
   ],
 };
 
