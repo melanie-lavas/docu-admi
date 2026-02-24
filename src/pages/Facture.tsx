@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { emptyClient, createLineItem, companyInfo } from "@/lib/companyInfo";
 import { Printer, ArrowLeft } from "lucide-react";
@@ -21,8 +21,6 @@ const FacturePage = () => {
   const [items, setItems] = useState<LineItem[]>([createLineItem()]);
   const [docNumber, setDocNumber] = useState("F-001");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [dueDate, setDueDate] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("virement");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("Paiement dû dans les 30 jours suivant la réception de la facture.");
 
@@ -80,24 +78,17 @@ const FacturePage = () => {
         <LineItemsTable items={items} onChange={setItems} showTaxes={true} />
 
         {/* Payment info */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
-          <div>
-            <Label className="text-xs text-muted-foreground">Date d'échéance</Label>
-            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="mt-1 h-9 text-sm" />
+        <div className="border border-border rounded-lg p-5 mb-6">
+          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+            Modalités de paiement
+          </h3>
+          <div className="space-y-2 text-sm mb-4">
+            <p className="text-foreground">☐ <strong>Option 1</strong> — Paiement en totalité avant le 1er mai 2026</p>
+            <p className="text-foreground">☐ <strong>Option 2</strong> — 2 versements égaux : 1er versement le 15 avril 2026, 2e versement le 15 août 2026</p>
           </div>
-          <div>
-            <Label className="text-xs text-muted-foreground">Mode de paiement</Label>
-            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-              <SelectTrigger className="mt-1 h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="virement">Virement Interac</SelectItem>
-                <SelectItem value="cheque">Chèque</SelectItem>
-                <SelectItem value="comptant">Comptant</SelectItem>
-                <SelectItem value="autre">Autre</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-1 text-sm text-muted-foreground">
+            <p><strong className="text-foreground">Mode de paiement :</strong> Virement Interac au 819-293-7675 ou argent comptant</p>
+            <p className="text-xs italic mt-2">Veuillez inscrire le numéro de facture avec chaque paiement.</p>
           </div>
         </div>
 
