@@ -129,6 +129,10 @@
 
   @page {
     size: letter;
-    margin: 0.5in;
+    margin: 0.3in;
+  }
+
+  .print-page {
+    font-size: 11px;
   }
 }

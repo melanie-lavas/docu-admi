@@ -33,10 +33,8 @@ const DocumentHeader = ({ documentType, documentNumber, date }: DocumentHeaderPr
           {documentType}
         </h2>
         <div className="flex gap-3 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
-          {documentNumber && (
-            <span>N° <strong className="text-foreground">{documentNumber}</strong></span>
-          )}
-          <span>Date: <strong className="text-foreground">{date || new Date().toLocaleDateString("fr-CA")}</strong></span>
+          <span>N° <strong className="text-foreground">{documentNumber || "___________"}</strong></span>
+          <span>Date: <strong className="text-foreground">{date || "___________"}</strong></span>
         </div>
       </div>
     </div>

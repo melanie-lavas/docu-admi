@@ -18,10 +18,10 @@ const SoumissionPage = () => {
   const navigate = useNavigate();
   const [client, setClient] = useState<ClientInfo>({ ...emptyClient });
   const [items, setItems] = useState<LineItem[]>([createLineItem()]);
-  const [docNumber, setDocNumber] = useState("S-001");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [docNumber, setDocNumber] = useState("");
+  const [date, setDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [notes, setNotes] = useState("Cette soumission est valide pour 30 jours à compter de la date d'émission.");
+  const [notes, setNotes] = useState("");
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
@@ -32,23 +32,10 @@ const SoumissionPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Toolbar */}
-      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex flex-wrap items-center justify-between gap-2">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1">
-          <ArrowLeft className="h-4 w-4" /> Retour
+      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center">
+        <Button size="sm" onClick={() => window.print()} className="gap-1">
+          <Printer className="h-4 w-4" /> Imprimer
         </Button>
-        <div className="flex flex-wrap gap-2 items-center">
-          <div className="flex items-center gap-1">
-            <Label className="text-xs text-muted-foreground">N°</Label>
-            <Input value={docNumber} onChange={(e) => setDocNumber(e.target.value)} className="w-20 sm:w-28 h-8 text-sm" />
-          </div>
-          <div className="flex items-center gap-1">
-            <Label className="text-xs text-muted-foreground hidden sm:inline">Date</Label>
-            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-32 sm:w-36 h-8 text-sm" />
-          </div>
-          <Button size="sm" onClick={() => window.print()} className="gap-1">
-            <Printer className="h-4 w-4" /> <span className="hidden sm:inline">Imprimer</span>
-          </Button>
-        </div>
       </div>
 
       {/* Document */}
