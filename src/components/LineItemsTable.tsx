@@ -27,15 +27,15 @@ const LineItemsTable = ({ items, onChange, showTaxes = true }: LineItemsTablePro
   return (
     <div className="mb-6">
       {/* Table */}
-      <div className="border border-border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="border border-border rounded-lg overflow-x-auto">
+        <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="document-header-gradient text-primary-foreground">
-              <th className="text-left p-3 font-semibold">Description</th>
-              <th className="text-center p-3 font-semibold w-24">Qté</th>
-              <th className="text-right p-3 font-semibold w-32">Prix unit.</th>
-              <th className="text-right p-3 font-semibold w-32">Total</th>
-              <th className="text-center p-3 w-12 no-print"></th>
+              <th className="text-left p-2 sm:p-3 font-semibold">Description</th>
+              <th className="text-center p-2 sm:p-3 font-semibold w-16 sm:w-24">Qté</th>
+              <th className="text-right p-2 sm:p-3 font-semibold w-24 sm:w-32">Prix unit.</th>
+              <th className="text-right p-2 sm:p-3 font-semibold w-24 sm:w-32">Total</th>
+              <th className="text-center p-2 sm:p-3 w-10 sm:w-12 no-print"></th>
             </tr>
           </thead>
           <tbody>
