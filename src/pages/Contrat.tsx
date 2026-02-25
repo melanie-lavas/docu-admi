@@ -153,7 +153,7 @@ const ContratPage = () => {
         {/* Signatures */}
         <div className="grid grid-cols-2 gap-8 mt-12">
           <div>
-            <img src={signatureImg} alt="Signature Maxime Jutras" className="h-24 mx-auto mb-1 object-contain" />
+            <img src={signatureImg} alt="Signature Maxime Jutras" className="w-full h-auto max-h-32 mb-1 object-contain" />
             <div className="border-t-2 border-foreground pt-2 text-center text-sm text-muted-foreground">
               Signature de l'entrepreneur
             </div>
