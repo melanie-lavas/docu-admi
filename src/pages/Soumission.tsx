@@ -32,7 +32,10 @@ const SoumissionPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Toolbar */}
-      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center">
+      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2">
+        <Button size="sm" variant="outline" onClick={() => navigate("/")} className="gap-1">
+          <ArrowLeft className="h-4 w-4" /> Menu
+        </Button>
         <Button size="sm" onClick={() => window.print()} className="gap-1">
           <Printer className="h-4 w-4" /> Imprimer
         </Button>

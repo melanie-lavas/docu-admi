@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Receipt, ScrollText } from "lucide-react";
+import { FileText, Receipt, ScrollText, Mail, Users } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 
@@ -21,6 +21,18 @@ const documentTypes = [
     description: "Entente de services avec termes et conditions",
     icon: ScrollText,
     path: "/contrat",
+  },
+  {
+    title: "Templates Courriel",
+    description: "Réponses pré-faites à copier-coller",
+    icon: Mail,
+    path: "/courriels",
+  },
+  {
+    title: "Gestion Clients",
+    description: "Fiches clients, runs, paiements et contrats",
+    icon: Users,
+    path: "/clients",
   },
 ];
 
@@ -44,9 +56,9 @@ const Index = () => {
       {/* Document Cards */}
       <main className="flex-1 max-w-4xl mx-auto w-full p-8">
         <h2 className="text-lg font-display font-bold text-foreground mb-6">
-          Choisissez un type de document
+          Choisissez une section
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {documentTypes.map((doc) => (
             <button
               key={doc.path}

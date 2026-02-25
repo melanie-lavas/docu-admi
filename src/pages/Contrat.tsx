@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { companyInfo } from "@/lib/companyInfo";
-import { Printer } from "lucide-react";
+import { Printer, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import signatureImg from "@/assets/signature-max.png";
 
 const ContratPage = () => {
+  const navigate = useNavigate();
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -24,7 +26,10 @@ const ContratPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Toolbar */}
-      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center">
+      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2">
+        <Button size="sm" variant="outline" onClick={() => navigate("/")} className="gap-1">
+          <ArrowLeft className="h-4 w-4" /> Menu
+        </Button>
         <Button size="sm" onClick={() => window.print()} className="gap-1">
           <Printer className="h-4 w-4" /> Imprimer
         </Button>
@@ -72,6 +77,9 @@ const ContratPage = () => {
           </h3>
           <p className="text-sm font-semibold text-foreground">
             Valide du 1er mai 2026 au 15 octobre 2026 — 22 passages assurés.
+          </p>
+          <p className="text-sm text-foreground mt-2">
+            Entretien hebdomadaire sauf en cas d'urgence météo.
           </p>
         </div>
 

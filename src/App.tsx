@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import Soumission from "./pages/Soumission";
 import Facture from "./pages/Facture";
 import Contrat from "./pages/Contrat";
+import EmailTemplates from "./pages/EmailTemplates";
+import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +24,8 @@ const App = () => (
           <Route path="/soumission" element={<Soumission />} />
           <Route path="/facture" element={<Facture />} />
           <Route path="/contrat" element={<Contrat />} />
+          <Route path="/courriels" element={<EmailTemplates />} />
+          <Route path="/clients" element={<Clients />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
