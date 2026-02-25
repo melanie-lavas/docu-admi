@@ -158,6 +158,7 @@ const ClientsPage = () => {
           <div className="flex flex-wrap gap-2 mb-6">
             <Button size="sm" variant="outline" className="gap-1" onClick={() => {
               const params = new URLSearchParams({
+                clientId: selectedClient.id,
                 name: selectedClient.name,
                 address: selectedClient.address || "",
                 city: selectedClient.city || "",
@@ -170,6 +171,7 @@ const ClientsPage = () => {
             </Button>
             <Button size="sm" variant="outline" className="gap-1" onClick={() => {
               const params = new URLSearchParams({
+                clientId: selectedClient.id,
                 name: selectedClient.name,
                 address: selectedClient.address || "",
                 city: selectedClient.city || "",
@@ -182,6 +184,7 @@ const ClientsPage = () => {
             </Button>
             <Button size="sm" variant="outline" className="gap-1" onClick={() => {
               const params = new URLSearchParams({
+                clientId: selectedClient.id,
                 name: selectedClient.name,
                 address: selectedClient.address || "",
                 city: selectedClient.city || "",
