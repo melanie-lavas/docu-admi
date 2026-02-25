@@ -6,11 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { companyInfo } from "@/lib/companyInfo";
 import { Printer, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import signatureImg from "@/assets/signature-max.png";
 
 const ContratPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const clientName = searchParams.get("name") || "";
+  const clientAddress = searchParams.get("address") || "";
+  const clientCity = searchParams.get("city") || "";
+  const clientPhone = searchParams.get("phone") || "";
+  const clientEmail = searchParams.get("email") || "";
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -47,24 +53,24 @@ const ContratPage = () => {
           <div className="space-y-4 text-sm">
             <div className="flex items-end gap-2">
               <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Nom / Entreprise :</span>
-              <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+              <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientName}</div>
             </div>
             <div className="flex items-end gap-2">
               <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Adresse :</span>
-              <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+              <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientAddress}</div>
             </div>
             <div className="flex items-end gap-2">
               <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Ville :</span>
-              <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+              <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientCity}</div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="flex items-end gap-2">
                 <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Téléphone :</span>
-                <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+                <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientPhone}</div>
               </div>
               <div className="flex items-end gap-2">
                 <span className="text-muted-foreground whitespace-nowrap min-w-[80px]">Courriel :</span>
-                <div className="flex-1 border-b border-foreground/40 min-h-[24px]"></div>
+                <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientEmail}</div>
               </div>
             </div>
           </div>

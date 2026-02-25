@@ -11,13 +11,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { emptyClient, createLineItem, companyInfo } from "@/lib/companyInfo";
 import { Printer, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { ClientInfo, LineItem } from "@/lib/companyInfo";
 import signatureImg from "@/assets/signature-max.png";
 
 const FacturePage = () => {
   const navigate = useNavigate();
-  const [client, setClient] = useState<ClientInfo>({ ...emptyClient });
+  const [searchParams] = useSearchParams();
+  const initialClient: ClientInfo = {
+    name: searchParams.get("name") || "",
+    address: searchParams.get("address") || "",
+    city: searchParams.get("city") || "",
+    phone: searchParams.get("phone") || "",
+    email: searchParams.get("email") || "",
+  };
+  const [client, setClient] = useState<ClientInfo>(initialClient.name ? initialClient : { ...emptyClient });
   const [items, setItems] = useState<LineItem[]>([createLineItem()]);
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
