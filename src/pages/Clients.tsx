@@ -154,6 +154,46 @@ const ClientsPage = () => {
             )}
           </div>
 
+          {/* Quick document creation */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            <Button size="sm" variant="outline" className="gap-1" onClick={() => {
+              const params = new URLSearchParams({
+                name: selectedClient.name,
+                address: selectedClient.address || "",
+                city: selectedClient.city || "",
+                phone: selectedClient.phone || "",
+                email: selectedClient.email || "",
+              });
+              navigate(`/soumission?${params.toString()}`);
+            }}>
+              <FileText className="h-3 w-3" /> Créer Soumission
+            </Button>
+            <Button size="sm" variant="outline" className="gap-1" onClick={() => {
+              const params = new URLSearchParams({
+                name: selectedClient.name,
+                address: selectedClient.address || "",
+                city: selectedClient.city || "",
+                phone: selectedClient.phone || "",
+                email: selectedClient.email || "",
+              });
+              navigate(`/facture?${params.toString()}`);
+            }}>
+              <DollarSign className="h-3 w-3" /> Créer Facture
+            </Button>
+            <Button size="sm" variant="outline" className="gap-1" onClick={() => {
+              const params = new URLSearchParams({
+                name: selectedClient.name,
+                address: selectedClient.address || "",
+                city: selectedClient.city || "",
+                phone: selectedClient.phone || "",
+                email: selectedClient.email || "",
+              });
+              navigate(`/contrat?${params.toString()}`);
+            }}>
+              <CalendarCheck className="h-3 w-3" /> Créer Contrat
+            </Button>
+          </div>
+
           {/* Tabs for documents, payments, runs */}
           <Tabs defaultValue="documents">
             <TabsList className="mb-4">
