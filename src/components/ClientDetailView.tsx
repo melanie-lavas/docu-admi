@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, FileText, DollarSign, CalendarCheck, Trash2, Plus, Send, Save } from "lucide-react";
+import { ArrowLeft, FileText, DollarSign, CalendarCheck, Trash2, Plus, Send, Save, Download } from "lucide-react";
+import { generateDocumentPdf } from "@/lib/generateDocumentPdf";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -256,6 +257,9 @@ const ClientDetailView = ({
                     <div className="flex gap-2 mt-2">
                       <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => openDocument(doc)}>
                         <FileText className="h-3 w-3" /> Ouvrir
+                      </Button>
+                      <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => generateDocumentPdf(client, doc)}>
+                        <Download className="h-3 w-3" /> PDF
                       </Button>
                       {client.email && (
                         <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => sendDocumentByEmail(doc)}>
