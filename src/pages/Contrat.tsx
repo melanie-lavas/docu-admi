@@ -3,27 +3,17 @@ import DocumentHeader from "@/components/DocumentHeader";
 import DocumentFooter from "@/components/DocumentFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { companyInfo } from "@/lib/companyInfo";
-import { Printer, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Printer } from "lucide-react";
 import signatureImg from "@/assets/signature-max.png";
 
 const ContratPage = () => {
-  const navigate = useNavigate();
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [nbPassages, setNbPassages] = useState("22");
   const [totalPrice, setTotalPrice] = useState("");
   const [paymentOption, setPaymentOption] = useState<"" | "A" | "B">("");
-  const [conditions, setConditions] = useState(
-    `1. L'entrepreneur s'engage à fournir les services décrits ci-dessus selon les termes convenus.\n2. Le client s'engage à payer le montant total convenu selon les modalités établies.\n3. Tout travail additionnel non prévu au contrat fera l'objet d'une soumission séparée.\n4. Ce contrat peut être résilié par l'une ou l'autre des parties avec un préavis écrit de 30 jours.\n5. L'entrepreneur n'est pas responsable des dommages causés par des conditions météorologiques extrêmes.`
-  );
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
@@ -80,22 +70,8 @@ const ContratPage = () => {
           <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
             Période du contrat
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <Label className="text-muted-foreground text-xs">Date de début</Label>
-              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-muted-foreground text-xs">Date de fin</Label>
-              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-muted-foreground text-xs">Nombre de passages</Label>
-              <Input value={nbPassages} onChange={(e) => setNbPassages(e.target.value)} className="mt-1" />
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            Le Prestataire effectuera {nbPassages} passages pendant la période contractualisée, répartis régulièrement en fonction des besoins de la pelouse et des conditions climatiques. La fréquence peut être ajustée par le Prestataire selon les recommandations agronomiques.
+          <p className="text-sm font-semibold text-foreground">
+            Valide du 1er mai 2026 au 15 octobre 2026 — 22 passages assurés.
           </p>
         </div>
 
@@ -129,7 +105,7 @@ const ContratPage = () => {
               placeholder="0.00"
               className="w-40 text-right"
             />
-            <span className="text-muted-foreground text-sm">$ (avant taxes)</span>
+            <span className="text-muted-foreground text-sm">$</span>
           </div>
 
           {/* Payment Options */}
@@ -160,15 +136,18 @@ const ContratPage = () => {
           </div>
         </div>
 
-        {/* Conditions */}
-        <div className="mb-6">
-          <Label className="text-xs text-muted-foreground">Termes et conditions</Label>
-          <Textarea
-            value={conditions}
-            onChange={(e) => setConditions(e.target.value)}
-            rows={8}
-            className="mt-1 text-sm"
-          />
+        {/* Clauses */}
+        <div className="border border-border rounded-lg p-5 mb-6">
+          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-3">
+            Clauses du contrat
+          </h3>
+          <ol className="list-decimal list-inside space-y-1.5 text-xs text-foreground">
+            <li>L'entrepreneur se réserve le droit de mettre fin au contrat sans préavis en cas de manque de respect ou de non-paiement.</li>
+            <li>L'entrepreneur n'est pas responsable des conditions météorologiques. En cas de pluie pendant trois jours consécutifs ou plus, il fera de son mieux malgré le retard, mais ne pourra être tenu responsable.</li>
+            <li>Le gazon sera coupé à une hauteur de 3 pouces (1 à 2 passages selon les besoins).</li>
+            <li>Le client dispose de 24 heures après le service ou le passage pour signaler toute insatisfaction ou plainte. Passé ce délai, aucune plainte ne sera prise en considération.</li>
+            <li>Tout travail additionnel non prévu au contrat fera l'objet d'une soumission séparée.</li>
+          </ol>
         </div>
 
         {/* Signatures */}
