@@ -1,13 +1,16 @@
 import { companyInfo } from "@/lib/companyInfo";
+import { Input } from "@/components/ui/input";
 import logoEmj from "@/assets/logo-emj.png";
 
 interface DocumentHeaderProps {
   documentType: string;
   documentNumber?: string;
   date?: string;
+  onDocNumberChange?: (value: string) => void;
+  onDateChange?: (value: string) => void;
 }
 
-const DocumentHeader = ({ documentType, documentNumber, date }: DocumentHeaderProps) => {
+const DocumentHeader = ({ documentType, documentNumber, date, onDocNumberChange, onDateChange }: DocumentHeaderProps) => {
   return (
     <div className="mb-6">
       {/* Company Banner */}
@@ -28,13 +31,37 @@ const DocumentHeader = ({ documentType, documentNumber, date }: DocumentHeaderPr
       </div>
 
       {/* Document Title Bar */}
-      <div className="bg-secondary border border-t-0 border-border rounded-b-lg px-4 sm:px-6 py-2 sm:py-3 flex flex-col sm:flex-row justify-between items-center gap-1">
+      <div className="bg-secondary border border-t-0 border-border rounded-b-lg px-4 sm:px-6 py-2 sm:py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
         <h2 className="text-base sm:text-xl font-display font-bold text-foreground uppercase tracking-wide">
           {documentType}
         </h2>
-        <div className="flex gap-3 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
-          <span>N° <strong className="text-foreground">{documentNumber || "___________"}</strong></span>
-          <span>Date: <strong className="text-foreground">{date || "___________"}</strong></span>
+        <div className="flex gap-2 sm:gap-4 items-center text-xs sm:text-sm">
+          {onDocNumberChange ? (
+            <div className="flex items-center gap-1">
+              <span className="text-muted-foreground">N°</span>
+              <Input
+                value={documentNumber || ""}
+                onChange={(e) => onDocNumberChange(e.target.value)}
+                placeholder="001"
+                className="w-20 h-7 text-xs font-semibold"
+              />
+            </div>
+          ) : (
+            <span className="text-muted-foreground">N° <strong className="text-foreground">{documentNumber || "___________"}</strong></span>
+          )}
+          {onDateChange ? (
+            <div className="flex items-center gap-1">
+              <span className="text-muted-foreground">Date:</span>
+              <Input
+                type="date"
+                value={date || ""}
+                onChange={(e) => onDateChange(e.target.value)}
+                className="w-36 h-7 text-xs font-semibold"
+              />
+            </div>
+          ) : (
+            <span className="text-muted-foreground">Date: <strong className="text-foreground">{date || "___________"}</strong></span>
+          )}
         </div>
       </div>
     </div>
