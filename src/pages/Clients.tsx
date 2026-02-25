@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Plus, Search, User, FileText, DollarSign, CalendarCheck, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Search, User } from "lucide-react";
 import { toast } from "sonner";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+import ClientDetailView from "@/components/ClientDetailView";
 
 type Client = Tables<"clients">;
 type ClientDocument = Tables<"client_documents">;
@@ -43,8 +43,6 @@ const ClientsPage = () => {
   const [documents, setDocuments] = useState<ClientDocument[]>([]);
   const [payments, setPayments] = useState<ClientPayment[]>([]);
   const [runs, setRuns] = useState<ClientRun[]>([]);
-
-  // Form state for new/edit client
   const [form, setForm] = useState<TablesInsert<"clients">>({ name: "" });
 
   const fetchClients = async () => {
@@ -63,19 +61,21 @@ const ClientsPage = () => {
     if (rns.data) setRuns(rns.data);
   };
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
+  useEffect(() => { fetchClients(); }, []);
+  useEffect(() => { if (selectedClient) fetchClientDetails(selectedClient.id); }, [selectedClient]);
 
-  useEffect(() => {
-    if (selectedClient) fetchClientDetails(selectedClient.id);
-  }, [selectedClient]);
+  const handleRefresh = () => {
+    if (selectedClient) {
+      // Re-fetch client data too
+      supabase.from("clients").select("*").eq("id", selectedClient.id).single().then(({ data }) => {
+        if (data) setSelectedClient(data);
+      });
+      fetchClientDetails(selectedClient.id);
+    }
+  };
 
   const saveClient = async () => {
-    if (!form.name?.trim()) {
-      toast.error("Le nom est requis");
-      return;
-    }
+    if (!form.name?.trim()) { toast.error("Le nom est requis"); return; }
     if (selectedClient) {
       await supabase.from("clients").update(form).eq("id", selectedClient.id);
       toast.success("Client mis à jour");
@@ -118,157 +118,16 @@ const ClientsPage = () => {
   // Client detail view
   if (selectedClient && !showForm) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => setSelectedClient(null)} className="gap-1">
-            <ArrowLeft className="h-4 w-4" /> Retour
-          </Button>
-          <h1 className="text-sm font-semibold text-foreground truncate">{selectedClient.name}</h1>
-          <div className="ml-auto flex gap-1">
-            <Button size="sm" variant="outline" onClick={() => editClient(selectedClient)}>Modifier</Button>
-            <Button size="sm" variant="destructive" onClick={() => deleteClient(selectedClient.id)}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="max-w-4xl mx-auto p-4 sm:p-8">
-          {/* Client Info Card */}
-          <div className="border border-border rounded-lg p-5 mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <div><span className="text-muted-foreground">Adresse:</span> {selectedClient.address}</div>
-              <div><span className="text-muted-foreground">Ville:</span> {selectedClient.city}</div>
-              <div><span className="text-muted-foreground">Tél:</span> {selectedClient.phone}</div>
-              <div><span className="text-muted-foreground">Courriel:</span> {selectedClient.email}</div>
-            </div>
-            <div className="flex gap-2 mt-3">
-              <Badge variant={statusColors[selectedClient.contract_status || "non_signe"] as any}>
-                Contrat: {statusLabels[selectedClient.contract_status || "non_signe"]}
-              </Badge>
-              <Badge variant={statusColors[selectedClient.payment_status || "en_attente"] as any}>
-                Paiement: {statusLabels[selectedClient.payment_status || "en_attente"]}
-              </Badge>
-            </div>
-            {selectedClient.notes && (
-              <p className="text-xs text-muted-foreground mt-3 border-t border-border pt-3">{selectedClient.notes}</p>
-            )}
-          </div>
-
-          {/* Quick document creation */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            <Button size="sm" variant="outline" className="gap-1" onClick={() => {
-              const params = new URLSearchParams({
-                clientId: selectedClient.id,
-                name: selectedClient.name,
-                address: selectedClient.address || "",
-                city: selectedClient.city || "",
-                phone: selectedClient.phone || "",
-                email: selectedClient.email || "",
-              });
-              navigate(`/soumission?${params.toString()}`);
-            }}>
-              <FileText className="h-3 w-3" /> Créer Soumission
-            </Button>
-            <Button size="sm" variant="outline" className="gap-1" onClick={() => {
-              const params = new URLSearchParams({
-                clientId: selectedClient.id,
-                name: selectedClient.name,
-                address: selectedClient.address || "",
-                city: selectedClient.city || "",
-                phone: selectedClient.phone || "",
-                email: selectedClient.email || "",
-              });
-              navigate(`/facture?${params.toString()}`);
-            }}>
-              <DollarSign className="h-3 w-3" /> Créer Facture
-            </Button>
-            <Button size="sm" variant="outline" className="gap-1" onClick={() => {
-              const params = new URLSearchParams({
-                clientId: selectedClient.id,
-                name: selectedClient.name,
-                address: selectedClient.address || "",
-                city: selectedClient.city || "",
-                phone: selectedClient.phone || "",
-                email: selectedClient.email || "",
-              });
-              navigate(`/contrat?${params.toString()}`);
-            }}>
-              <CalendarCheck className="h-3 w-3" /> Créer Contrat
-            </Button>
-          </div>
-
-          {/* Tabs for documents, payments, runs */}
-          <Tabs defaultValue="documents">
-            <TabsList className="mb-4">
-              <TabsTrigger value="documents" className="gap-1 text-xs"><FileText className="h-3 w-3" /> Documents</TabsTrigger>
-              <TabsTrigger value="payments" className="gap-1 text-xs"><DollarSign className="h-3 w-3" /> Paiements</TabsTrigger>
-              <TabsTrigger value="runs" className="gap-1 text-xs"><CalendarCheck className="h-3 w-3" /> Passages</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="documents">
-              {documents.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun document</p>
-              ) : (
-                <div className="space-y-2">
-                  {documents.map((doc) => (
-                    <div key={doc.id} className="border border-border rounded-lg p-3 flex items-center justify-between text-sm">
-                      <div>
-                        <span className="font-semibold capitalize">{doc.doc_type}</span>
-                        {doc.doc_number && <span className="text-muted-foreground ml-2">#{doc.doc_number}</span>}
-                        <span className="text-muted-foreground ml-2">{doc.date}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="font-semibold">{Number(doc.amount).toFixed(2)}$</span>
-                        <Badge variant="outline" className="ml-2 text-xs">{doc.status}</Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="payments">
-              {payments.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun paiement</p>
-              ) : (
-                <div className="space-y-2">
-                  {payments.map((pay) => (
-                    <div key={pay.id} className="border border-border rounded-lg p-3 flex items-center justify-between text-sm">
-                      <div>
-                        <span className="font-semibold">{Number(pay.amount).toFixed(2)}$</span>
-                        <span className="text-muted-foreground ml-2">{pay.payment_date}</span>
-                      </div>
-                      <Badge variant="outline" className="text-xs capitalize">{pay.method}</Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="runs">
-              {runs.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun passage</p>
-              ) : (
-                <div className="space-y-2">
-                  {runs.map((run) => (
-                    <div key={run.id} className="border border-border rounded-lg p-3 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">{run.run_date}</span>
-                        <Badge variant={run.completed ? "default" : "secondary"}>
-                          {run.completed ? "Complété" : "Planifié"}
-                        </Badge>
-                      </div>
-                      {run.services_done && run.services_done.length > 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">{run.services_done.join(", ")}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
+      <ClientDetailView
+        client={selectedClient}
+        documents={documents}
+        payments={payments}
+        runs={runs}
+        onBack={() => setSelectedClient(null)}
+        onEdit={editClient}
+        onDelete={deleteClient}
+        onRefresh={handleRefresh}
+      />
     );
   }
 
@@ -335,12 +194,7 @@ const ClientsPage = () => {
       <div className="max-w-4xl mx-auto p-4 sm:p-8">
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher un client..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+          <Input placeholder="Rechercher un client..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
 
         {filteredClients.length === 0 ? (
