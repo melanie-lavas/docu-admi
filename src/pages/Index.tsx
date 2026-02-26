@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Receipt, ScrollText, Mail, Users } from "lucide-react";
+import { FileText, Receipt, ScrollText, Mail, Users, Leaf } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 
@@ -33,6 +33,12 @@ const documentTypes = [
     description: "Fiches clients, runs, paiements et contrats",
     icon: Users,
     path: "/clients",
+  },
+  {
+    title: "Run de Gazon",
+    description: "Liste des clients pour la tonte avec suivi",
+    icon: Leaf,
+    path: "/run-gazon",
   },
 ];
 
