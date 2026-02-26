@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Receipt, ScrollText, Mail, Users, Leaf, Megaphone } from "lucide-react";
+import { FileText, Receipt, ScrollText, Mail, Users, Leaf, Megaphone, Wallet, CalendarDays } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 
@@ -39,6 +39,18 @@ const documentTypes = [
     description: "Liste des clients pour la tonte avec suivi",
     icon: Leaf,
     path: "/run-gazon",
+  },
+  {
+    title: "Dépenses",
+    description: "Suivi des dépenses d'entreprise par catégorie",
+    icon: Wallet,
+    path: "/depenses",
+  },
+  {
+    title: "Agenda",
+    description: "Rendez-vous, rappels et tâches planifiées",
+    icon: CalendarDays,
+    path: "/agenda",
   },
   {
     title: "Publicité IA",

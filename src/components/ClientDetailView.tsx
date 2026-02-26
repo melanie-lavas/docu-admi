@@ -117,6 +117,24 @@ const ClientDetailView = ({
     }
   };
 
+  const deleteDocument = async (id: string) => {
+    const { error } = await supabase.from("client_documents").delete().eq("id", id);
+    if (error) toast.error("Erreur lors de la suppression");
+    else {
+      toast.success("Document supprimé");
+      onRefresh();
+    }
+  };
+
+  const deleteRun = async (id: string) => {
+    const { error } = await supabase.from("client_runs").delete().eq("id", id);
+    if (error) toast.error("Erreur lors de la suppression");
+    else {
+      toast.success("Passage supprimé");
+      onRefresh();
+    }
+  };
+
   const buildDocParams = () => {
     return new URLSearchParams({
       clientId: client.id,
@@ -266,6 +284,9 @@ const ClientDetailView = ({
                           <Send className="h-3 w-3" /> Envoyer par courriel
                         </Button>
                       )}
+                      <Button size="sm" variant="ghost" className="gap-1 h-7 text-xs text-destructive hover:text-destructive" onClick={() => deleteDocument(doc.id)}>
+                        <Trash2 className="h-3 w-3" /> Supprimer
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -349,12 +370,17 @@ const ClientDetailView = ({
             ) : (
               <div className="space-y-2">
                 {runs.map((run) => (
-                  <div key={run.id} className="border border-border rounded-lg p-3 text-sm">
+                   <div key={run.id} className="border border-border rounded-lg p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">{run.run_date}</span>
-                      <Badge variant={run.completed ? "default" : "secondary"}>
-                        {run.completed ? "Complété" : "Planifié"}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={run.completed ? "default" : "secondary"}>
+                          {run.completed ? "Complété" : "Planifié"}
+                        </Badge>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => deleteRun(run.id)}>
+                          <Trash2 className="h-3 w-3 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                     {run.services_done && run.services_done.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-1">{run.services_done.join(", ")}</p>
