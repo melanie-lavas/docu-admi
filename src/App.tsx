@@ -11,6 +11,8 @@ import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
 import Publicite from "./pages/Publicite";
+import Depenses from "./pages/Depenses";
+import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/clients" element={<Clients />} />
           <Route path="/run-gazon" element={<RunGazon />} />
           <Route path="/publicite" element={<Publicite />} />
+          <Route path="/depenses" element={<Depenses />} />
+          <Route path="/agenda" element={<Agenda />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
