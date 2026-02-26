@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Receipt, ScrollText, Mail, Users, Leaf } from "lucide-react";
+import { FileText, Receipt, ScrollText, Mail, Users, Leaf, Megaphone } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 
@@ -39,6 +39,12 @@ const documentTypes = [
     description: "Liste des clients pour la tonte avec suivi",
     icon: Leaf,
     path: "/run-gazon",
+  },
+  {
+    title: "Publicité IA",
+    description: "Générer textes et images publicitaires avec l'IA",
+    icon: Megaphone,
+    path: "/publicite",
   },
 ];
 

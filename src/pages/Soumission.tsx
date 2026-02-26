@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { emptyClient, createLineItem, companyInfo, calculateSubtotal } from "@/lib/companyInfo";
-import { Printer, ArrowLeft, Save } from "lucide-react";
+import { Printer, ArrowLeft, Save, Share2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -34,6 +34,15 @@ const SoumissionPage = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: `Soumission ${docNumber || ""} — E.M.J`, url }); return; } catch {}
+    }
+    await navigator.clipboard.writeText(url);
+    toast.success("Lien copié!");
+  };
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
@@ -77,6 +86,9 @@ const SoumissionPage = () => {
             <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
           </Button>
         )}
+        <Button size="sm" variant="outline" onClick={handleShare} className="gap-1">
+          <Share2 className="h-4 w-4" /> Partager
+        </Button>
         <Button size="sm" onClick={() => window.print()} className="gap-1">
           <Printer className="h-4 w-4" /> Imprimer
         </Button>
