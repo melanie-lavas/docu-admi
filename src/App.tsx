@@ -9,6 +9,7 @@ import Facture from "./pages/Facture";
 import Contrat from "./pages/Contrat";
 import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
+import RunGazon from "./pages/RunGazon";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/contrat" element={<Contrat />} />
           <Route path="/courriels" element={<EmailTemplates />} />
           <Route path="/clients" element={<Clients />} />
+          <Route path="/run-gazon" element={<RunGazon />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
