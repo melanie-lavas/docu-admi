@@ -10,6 +10,7 @@ import Contrat from "./pages/Contrat";
 import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
+import Publicite from "./pages/Publicite";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/courriels" element={<EmailTemplates />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/run-gazon" element={<RunGazon />} />
+          <Route path="/publicite" element={<Publicite />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

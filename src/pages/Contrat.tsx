@@ -1,26 +1,31 @@
 import { useState } from "react";
 import DocumentHeader from "@/components/DocumentHeader";
+import ClientSection from "@/components/ClientSection";
 import DocumentFooter from "@/components/DocumentFooter";
 import SignatureCanvas from "@/components/SignatureCanvas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { companyInfo } from "@/lib/companyInfo";
-import { Printer, ArrowLeft, Save } from "lucide-react";
+import { companyInfo, emptyClient } from "@/lib/companyInfo";
+import { Printer, ArrowLeft, Save, Share2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { ClientInfo } from "@/lib/companyInfo";
 import signatureImg from "@/assets/signature-max.png";
 
 const ContratPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get("clientId") || "";
-  const clientName = searchParams.get("name") || "";
-  const clientAddress = searchParams.get("address") || "";
-  const clientCity = searchParams.get("city") || "";
-  const clientPhone = searchParams.get("phone") || "";
-  const clientEmail = searchParams.get("email") || "";
+  const initialClient: ClientInfo = {
+    name: searchParams.get("name") || "",
+    address: searchParams.get("address") || "",
+    city: searchParams.get("city") || "",
+    phone: searchParams.get("phone") || "",
+    email: searchParams.get("email") || "",
+  };
+  const [client, setClient] = useState<ClientInfo>(initialClient.name ? initialClient : { ...emptyClient });
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -57,6 +62,18 @@ const ContratPage = () => {
     }
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `Contrat ${docNumber || ""} — E.M.J`, url });
+        return;
+      } catch {}
+    }
+    await navigator.clipboard.writeText(url);
+    toast.success("Lien copié!");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Toolbar */}
@@ -69,6 +86,9 @@ const ContratPage = () => {
             <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
           </Button>
         )}
+        <Button size="sm" variant="outline" onClick={handleShare} className="gap-1">
+          <Share2 className="h-4 w-4" /> Partager
+        </Button>
         <Button size="sm" onClick={() => window.print()} className="gap-1">
           <Printer className="h-4 w-4" /> Imprimer
         </Button>
@@ -84,36 +104,7 @@ const ContratPage = () => {
           onDateChange={setDate}
         />
 
-        {/* Client Section */}
-        <div className="border border-border rounded-lg p-5 mb-6">
-          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
-            Informations du client
-          </h3>
-          <div className="space-y-4 text-sm">
-            <div className="flex items-end gap-2">
-              <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Nom / Entreprise :</span>
-              <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientName}</div>
-            </div>
-            <div className="flex items-end gap-2">
-              <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Adresse :</span>
-              <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientAddress}</div>
-            </div>
-            <div className="flex items-end gap-2">
-              <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Ville :</span>
-              <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientCity}</div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="flex items-end gap-2">
-                <span className="text-muted-foreground whitespace-nowrap min-w-[120px]">Téléphone :</span>
-                <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientPhone}</div>
-              </div>
-              <div className="flex items-end gap-2">
-                <span className="text-muted-foreground whitespace-nowrap min-w-[80px]">Courriel :</span>
-                <div className="flex-1 border-b border-foreground/40 min-h-[24px]">{clientEmail}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ClientSection client={client} onChange={setClient} />
 
         {/* Contract Period */}
         <div className="border border-border rounded-lg p-5 mb-6">
@@ -157,6 +148,8 @@ const ContratPage = () => {
               onChange={(e) => setTotalPrice(e.target.value)}
               placeholder="0.00"
               className="w-40 text-right"
+              type="number"
+              step="0.01"
             />
             <span className="text-muted-foreground text-sm">$</span>
           </div>
@@ -189,6 +182,17 @@ const ContratPage = () => {
           </div>
         </div>
 
+        {/* Payment info */}
+        <div className="border border-border rounded-lg p-5 mb-6">
+          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+            Modalités de paiement
+          </h3>
+          <div className="space-y-1 text-sm text-muted-foreground">
+            <p><strong className="text-foreground">Mode de paiement :</strong> Virement Interac au 819-293-7675 ou argent comptant</p>
+            <p className="text-xs italic mt-2">Veuillez inscrire le numéro de contrat avec chaque paiement.</p>
+          </div>
+        </div>
+
         {/* Clauses */}
         <div className="border border-border rounded-lg p-5 mb-6">
           <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-3">
@@ -201,6 +205,14 @@ const ContratPage = () => {
             <li>Le client dispose de 24 heures après le service ou le passage pour signaler toute insatisfaction ou plainte. Passé ce délai, aucune plainte ne sera prise en considération.</li>
             <li>Tout travail additionnel non prévu au contrat fera l'objet d'une soumission séparée.</li>
           </ol>
+        </div>
+
+        {/* Important Notice */}
+        <div className="border border-destructive/30 bg-destructive/5 rounded-lg p-4 mb-6">
+          <p className="text-sm font-semibold text-destructive">⚠️ Important</p>
+          <p className="text-xs text-foreground mt-1">
+            Vous devez retourner le contrat signé avant le début des services. Un paiement non fait ou un contrat non signé peut entraîner l'arrêt des services.
+          </p>
         </div>
 
         {/* Signatures */}
