@@ -29,10 +29,18 @@ Le texte doit être accrocheur, inclure un appel à l'action avec le numéro de 
 Sujet demandé: ${topic || "promotion générale des services"}
 Format: Retourne UNIQUEMENT le texte publicitaire, prêt à copier-coller. Inclus des emojis pertinents.`;
     } else if (type === "image_prompt") {
-      systemPrompt += `\nGénère un prompt en anglais optimisé pour la génération d'image AI.
-Le prompt doit décrire une image professionnelle pour une publicité d'entretien paysager.
-Sujet demandé: ${topic || "entretien paysager professionnel"}
-Format: Retourne UNIQUEMENT le prompt en anglais, sans explication.`;
+      systemPrompt = `You are an expert at writing safe, detailed image generation prompts for AI models.
+Create a prompt describing a professional, high-quality photograph for a Facebook ad about landscaping services.
+The image should be photorealistic, well-lit, with vibrant colors and professional composition.
+Topic: ${topic || "professional landscaping services"}
+
+RULES:
+- Describe specific objects, scenery, lighting, and composition
+- Use neutral, professional language only
+- Focus on nature, gardens, lawns, outdoor spaces, equipment, or seasonal scenes
+- Include "professional photograph, high resolution, bright natural lighting, clean composition"
+- Do NOT include people, faces, or text in the image description
+- Return ONLY the English prompt, nothing else`;
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

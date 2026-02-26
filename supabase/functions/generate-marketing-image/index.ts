@@ -22,7 +22,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-image",
         messages: [
-          { role: "user", content: prompt || "Professional landscaping service promotional image, lush green lawn, beautiful garden, sunny day, high quality photo" },
+          { role: "user", content: `Generate this image for a Facebook advertisement: ${prompt || "Professional photograph of a perfectly manicured green lawn with trimmed hedges, garden beds with colorful flowers, bright sunny day, professional landscaping equipment visible, high resolution, clean composition, vibrant colors, no text, no people"}. The image should be in 16:9 landscape format suitable for Facebook ads.` },
         ],
         modalities: ["image", "text"],
       }),
