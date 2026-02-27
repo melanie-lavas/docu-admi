@@ -196,6 +196,27 @@ const DocumentsPage = () => {
     toast.success("PDF téléchargé!");
   };
 
+  const handleGenerateContractFromInvoice = () => {
+    if (!selectedClientId) {
+      toast.error("Veuillez sélectionner un client.");
+      return;
+    }
+    generateFullDocumentPdf({
+      docType: "contrat",
+      docNumber: docNumber ? `C-${docNumber}` : "",
+      date,
+      client,
+      items,
+      selectedServices,
+      notes,
+      paymentOption,
+      totalPrice: totalPrice || String(calculateSubtotal(items)),
+      logoBase64: logoB64,
+      signatureBase64: sigB64,
+    });
+    toast.success("Contrat PDF généré à partir de la facture!");
+  };
+
   const docLabels = {
     soumission: "Soumission",
     facture: "Facture",
@@ -222,6 +243,11 @@ const DocumentsPage = () => {
             <Button size="sm" onClick={handleDownloadPdf} className="gap-1">
               <Download className="h-4 w-4" /> PDF
             </Button>
+            {docType === "facture" && (
+              <Button size="sm" variant="secondary" onClick={handleGenerateContractFromInvoice} disabled={!selectedClientId} className="gap-1">
+                <ScrollText className="h-4 w-4" /> Contrat PDF
+              </Button>
+            )}
           </>
         )}
         {showPreview && (
