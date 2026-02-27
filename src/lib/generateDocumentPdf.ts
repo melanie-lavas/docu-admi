@@ -104,17 +104,17 @@ export function generateFullDocumentPdf(data: FullDocumentData) {
   if (client.email) { pdf.text(client.email, pageW - margin - 5, ry, { align: "right" }); ry += 5; }
   y += 34;
 
-  // ── Services checklist ──
-  if (selectedServices.length > 0) {
+  // ── Services checklist (contrat & soumission only — not on facture) ──
+  if (selectedServices.length > 0 && docType !== "facture") {
     checkPageBreak(10 + selectedServices.length * 5);
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
-    pdf.text("Services", margin, y);
+    pdf.text("Services inclus", margin, y);
     y += 6;
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     selectedServices.forEach((s) => {
-      pdf.text(`✓  ${s}`, margin + 3, y);
+      pdf.text(`•  ${s}`, margin + 3, y);
       y += 5;
     });
     y += 4;
@@ -235,27 +235,36 @@ export function generateFullDocumentPdf(data: FullDocumentData) {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
 
+    // Payment option box
+    pdf.setFillColor(245, 247, 250);
+    const payBoxH = paymentOption === "2" ? 28 : 22;
+    pdf.roundedRect(margin, y, contentW, payBoxH, 2, 2, "F");
+
     if (paymentOption === "1") {
       pdf.setFont("helvetica", "bold");
-      pdf.text("Option 1 — Paiement intégral", margin, y);
-      y += 5;
+      pdf.setFontSize(10);
+      pdf.text("Paiement intégral", margin + 5, y + 6);
       pdf.setFont("helvetica", "normal");
-      pdf.text("Paiement en totalité avant le 1er mai 2026", margin, y);
-      y += 6;
+      pdf.setFontSize(9);
+      pdf.text("Payable en totalité avant le 1er mai 2026.", margin + 5, y + 12);
+      pdf.text("Mode de paiement : Virement Interac au 819-293-7675 ou argent comptant.", margin + 5, y + 17);
     } else if (paymentOption === "2") {
       pdf.setFont("helvetica", "bold");
-      pdf.text("Option 2 — 2 versements égaux", margin, y);
-      y += 5;
+      pdf.setFontSize(10);
+      pdf.text("Paiement en 2 versements égaux", margin + 5, y + 6);
       pdf.setFont("helvetica", "normal");
-      pdf.text("1er versement le 15 avril 2026, 2e versement le 15 août 2026", margin, y);
-      y += 6;
+      pdf.setFontSize(9);
+      pdf.text("1er versement : 15 avril 2026", margin + 5, y + 12);
+      pdf.text("2e versement : 15 août 2026", margin + 5, y + 17);
+      pdf.text("Mode de paiement : Virement Interac au 819-293-7675 ou argent comptant.", margin + 5, y + 23);
     }
+    y += payBoxH + 3;
 
-    pdf.text("Mode de paiement : Virement Interac au 819-293-7675 ou argent comptant.", margin, y);
-    y += 5;
-    pdf.setFontSize(9);
+    pdf.setFontSize(8);
     pdf.setFont("helvetica", "italic");
+    pdf.setTextColor(100);
     pdf.text("Veuillez inscrire le numéro de document avec chaque paiement.", margin, y);
+    pdf.setTextColor(0);
     pdf.setFont("helvetica", "normal");
     y += 8;
   }
