@@ -340,19 +340,24 @@ export function generateFullDocumentPdf(data: FullDocumentData) {
   }
 
   // ── Signatures ──
-  const sigY = Math.max(y + 15, pageH - 45);
-  if (sigY > pageH - 20) {
+  checkPageBreak(50);
+  const sigY = Math.max(y + 15, pageH - 50);
+  if (sigY + 30 > pageH - 15) {
     pdf.addPage();
   }
-  const finalSigY = sigY > pageH - 20 ? 40 : sigY;
+  const finalSigY = (sigY + 30 > pageH - 15) ? 50 : sigY;
 
   pdf.setDrawColor(0);
   pdf.setLineWidth(0.5);
   // Entrepreneur — signature image
   if (signatureBase64) {
     try {
-      pdf.addImage(signatureBase64, "PNG", margin, finalSigY - 18, 55, 18);
-    } catch {}
+      // Detect format from data URL
+      const imgFormat = signatureBase64.includes("image/jpeg") ? "JPEG" : "PNG";
+      pdf.addImage(signatureBase64, imgFormat, margin, finalSigY - 20, 55, 20);
+    } catch (e) {
+      console.error("PDF signature addImage failed:", e);
+    }
   }
   pdf.line(margin, finalSigY, margin + 70, finalSigY);
   pdf.setFontSize(9);
