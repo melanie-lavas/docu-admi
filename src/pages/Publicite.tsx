@@ -24,11 +24,13 @@ const Publicite = () => {
   const fetchPhotos = async () => {
     const { data } = await supabase.storage.from("marketing-photos").list("", { sortBy: { column: "created_at", order: "desc" } });
     if (data) {
-      const items = data.map((f) => ({
-        name: f.name,
-        url: supabase.storage.from("marketing-photos").getPublicUrl(f.name).data.publicUrl,
-      }));
-      setPhotos(items);
+      const items = await Promise.all(
+        data.map(async (f) => {
+          const { data: signedData } = await supabase.storage.from("marketing-photos").createSignedUrl(f.name, 3600);
+          return { name: f.name, url: signedData?.signedUrl || "" };
+        })
+      );
+      setPhotos(items.filter((i) => i.url));
     }
   };
 
