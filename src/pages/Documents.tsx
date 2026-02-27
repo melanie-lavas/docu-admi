@@ -52,8 +52,8 @@ const DocumentsPage = () => {
 
   // Preload images for PDF
   useEffect(() => {
-    imageToBase64(logoImg).then(setLogoB64).catch(() => {});
-    imageToBase64(signatureImg).then(setSigB64).catch(() => {});
+    imageToBase64(logoImg).then(setLogoB64).catch((e) => console.error("Logo load failed:", e));
+    imageToBase64(signatureImg).then(setSigB64).catch((e) => console.error("Signature load failed:", e));
   }, []);
   // Fetch clients
   useEffect(() => {
