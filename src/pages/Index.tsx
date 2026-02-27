@@ -5,22 +5,10 @@ import { companyInfo } from "@/lib/companyInfo";
 
 const documentTypes = [
   {
-    title: "Soumission",
-    description: "Estimation de prix pour un client potentiel",
+    title: "Documents",
+    description: "Soumission, facture et contrat — tout en un",
     icon: FileText,
-    path: "/soumission",
-  },
-  {
-    title: "Facture",
-    description: "Document de facturation avec taxes (TPS/TVQ)",
-    icon: Receipt,
-    path: "/facture",
-  },
-  {
-    title: "Contrat de Service",
-    description: "Entente de services avec termes et conditions",
-    icon: ScrollText,
-    path: "/contrat",
+    path: "/documents",
   },
   {
     title: "Templates Courriel",
