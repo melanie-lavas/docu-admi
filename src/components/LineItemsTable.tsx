@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { LineItem } from "@/lib/companyInfo";
 import { createLineItem, calculateSubtotal, TPS_RATE, TVQ_RATE } from "@/lib/companyInfo";
 import { Input } from "@/components/ui/input";
@@ -10,11 +11,37 @@ interface LineItemsTableProps {
   showTaxes?: boolean;
 }
 
+// Parse a string that may use comma as decimal separator
+const parseNum = (val: string): number => {
+  const cleaned = val.replace(/\s/g, "").replace(",", ".");
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
+};
+
 const LineItemsTable = ({ items, onChange, showTaxes = true }: LineItemsTableProps) => {
+  // Track raw text values for quantity and price so user can type freely (commas, empty, etc.)
+  const [rawValues, setRawValues] = useState<Record<string, { qty?: string; price?: string }>>({});
+
   const addItem = () => onChange([...items, createLineItem()]);
-  const removeItem = (id: string) => onChange(items.filter((i) => i.id !== id));
+  const removeItem = (id: string) => {
+    onChange(items.filter((i) => i.id !== id));
+    setRawValues((prev) => { const n = { ...prev }; delete n[id]; return n; });
+  };
   const updateItem = (id: string, field: keyof LineItem, value: string | number) => {
     onChange(items.map((i) => (i.id === id ? { ...i, [field]: value } : i)));
+  };
+
+  const handleNumChange = (id: string, field: "quantity" | "unitPrice", raw: string) => {
+    const key = field === "quantity" ? "qty" : "price";
+    setRawValues((prev) => ({ ...prev, [id]: { ...prev[id], [key]: raw } }));
+    updateItem(id, field, parseNum(raw));
+  };
+
+  const getRaw = (id: string, field: "quantity" | "unitPrice", actual: number): string => {
+    const key = field === "quantity" ? "qty" : "price";
+    const r = rawValues[id]?.[key];
+    if (r !== undefined) return r;
+    return actual === 0 ? "" : String(actual);
   };
 
   const subtotal = calculateSubtotal(items);
@@ -51,25 +78,24 @@ const LineItemsTable = ({ items, onChange, showTaxes = true }: LineItemsTablePro
                 </td>
                 <td className="p-2">
                   <Input
-                    type="number"
-                    min={1}
-                    value={item.quantity}
-                    onChange={(e) => updateItem(item.id, "quantity", Number(e.target.value))}
+                    inputMode="decimal"
+                    value={getRaw(item.id, "quantity", item.quantity)}
+                    onChange={(e) => handleNumChange(item.id, "quantity", e.target.value)}
+                    placeholder="1"
                     className="border-0 shadow-none bg-transparent text-center"
                   />
                 </td>
                 <td className="p-2">
                   <Input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    value={item.unitPrice}
-                    onChange={(e) => updateItem(item.id, "unitPrice", Number(e.target.value))}
+                    inputMode="decimal"
+                    value={getRaw(item.id, "unitPrice", item.unitPrice)}
+                    onChange={(e) => handleNumChange(item.id, "unitPrice", e.target.value)}
+                    placeholder="0,00"
                     className="border-0 shadow-none bg-transparent text-right"
                   />
                 </td>
                 <td className="p-2 text-right font-medium text-foreground">
-                  {fmt(item.quantity * item.unitPrice)}
+                  {item.quantity * item.unitPrice > 0 ? fmt(item.quantity * item.unitPrice) : ""}
                 </td>
                 <td className="p-2 text-center no-print">
                   <Button
