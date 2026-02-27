@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { emptyClient, createLineItem, companyInfo, calculateSubtotal, TPS_RATE, TVQ_RATE } from "@/lib/companyInfo";
 import { generateFullDocumentPdf } from "@/lib/generateDocumentPdf";
+import { imageToBase64 } from "@/lib/imageToBase64";
 import { ArrowLeft, Save, FileText, Receipt, ScrollText, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +21,7 @@ import { toast } from "sonner";
 import type { ClientInfo, LineItem } from "@/lib/companyInfo";
 import type { Tables } from "@/integrations/supabase/types";
 import signatureImg from "@/assets/signature-max.png";
+import logoImg from "@/assets/logo-emj.png";
 
 type Client = Tables<"clients">;
 
@@ -45,7 +47,14 @@ const DocumentsPage = () => {
   const [saving, setSaving] = useState(false);
   const [savedServices, setSavedServices] = useState<SavedService[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [logoB64, setLogoB64] = useState("");
+  const [sigB64, setSigB64] = useState("");
 
+  // Preload images for PDF
+  useEffect(() => {
+    imageToBase64(logoImg).then(setLogoB64).catch(() => {});
+    imageToBase64(signatureImg).then(setSigB64).catch(() => {});
+  }, []);
   // Fetch clients
   useEffect(() => {
     supabase.from("clients").select("*").order("name").then(({ data }) => {
@@ -181,8 +190,11 @@ const DocumentsPage = () => {
       notes,
       paymentOption,
       totalPrice,
+      logoBase64: logoB64,
+      signatureBase64: sigB64,
     });
     toast.success("PDF téléchargé!");
+  };
   };
 
   const docLabels = {

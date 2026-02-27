@@ -22,12 +22,14 @@ export interface FullDocumentData {
   notes: string;
   paymentOption: "" | "1" | "2";
   totalPrice?: string;
+  logoBase64?: string;
+  signatureBase64?: string;
 }
 
 const fmt = (n: number) => n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " $";
 
 export function generateFullDocumentPdf(data: FullDocumentData) {
-  const { docType, docNumber, date, client, items, selectedServices, notes, paymentOption, totalPrice } = data;
+  const { docType, docNumber, date, client, items, selectedServices, notes, paymentOption, totalPrice, logoBase64, signatureBase64 } = data;
   const pdf = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -42,18 +44,24 @@ export function generateFullDocumentPdf(data: FullDocumentData) {
     }
   };
 
-  // ── Header: Company info ──
+  // ── Header: Logo + Company info ──
+  if (logoBase64) {
+    try {
+      pdf.addImage(logoBase64, "PNG", margin, y - 2, 18, 18);
+    } catch {}
+  }
+  const textX = logoBase64 ? margin + 22 : margin;
   pdf.setFontSize(18);
   pdf.setFont("helvetica", "bold");
-  pdf.text(companyInfo.name, margin, y);
+  pdf.text(companyInfo.name, textX, y);
   y += 6;
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "normal");
-  pdf.text(companyInfo.subtitle, margin, y);
+  pdf.text(companyInfo.subtitle, textX, y);
   y += 5;
-  pdf.text(`${companyInfo.owner} — ${companyInfo.phone}`, margin, y);
+  pdf.text(`${companyInfo.owner} — ${companyInfo.phone}`, textX, y);
   y += 5;
-  pdf.text(`Courriel: ${companyInfo.email} | NEQ: ${companyInfo.neq}`, margin, y);
+  pdf.text(`Courriel: ${companyInfo.email} | NEQ: ${companyInfo.neq}`, textX, y);
   y += 3;
 
   // Blue separator
@@ -331,7 +339,12 @@ export function generateFullDocumentPdf(data: FullDocumentData) {
 
   pdf.setDrawColor(0);
   pdf.setLineWidth(0.5);
-  // Entrepreneur
+  // Entrepreneur — signature image
+  if (signatureBase64) {
+    try {
+      pdf.addImage(signatureBase64, "PNG", margin, finalSigY - 18, 55, 18);
+    } catch {}
+  }
   pdf.line(margin, finalSigY, margin + 70, finalSigY);
   pdf.setFontSize(9);
   pdf.setFont("helvetica", "normal");
