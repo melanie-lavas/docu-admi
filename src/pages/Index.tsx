@@ -1,7 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Receipt, ScrollText, Mail, Users, Leaf, Megaphone, Wallet, CalendarDays } from "lucide-react";
+import { FileText, Receipt, ScrollText, Mail, Users, Leaf, Megaphone, Wallet, CalendarDays, LogOut } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const documentTypes = [
   {
@@ -54,7 +57,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Hero */}
-      <header className="document-header-gradient py-12 px-6 text-center">
+      <header className="document-header-gradient py-12 px-6 text-center relative">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="absolute top-3 right-3 text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10"
+          onClick={async () => {
+            await supabase.auth.signOut();
+            toast.success("Déconnexion réussie");
+            navigate("/auth");
+          }}
+        >
+          <LogOut className="h-4 w-4 mr-1" /> Déconnexion
+        </Button>
         <img src={logoEmj} alt="Logo E.M.J" className="w-24 h-24 rounded-xl mx-auto mb-4 object-cover shadow-lg" />
         <h1 className="text-3xl font-display font-bold text-primary-foreground">
           {companyInfo.name}
