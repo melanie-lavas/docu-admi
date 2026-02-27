@@ -195,7 +195,6 @@ const DocumentsPage = () => {
     });
     toast.success("PDF téléchargé!");
   };
-  };
 
   const docLabels = {
     soumission: "Soumission",
