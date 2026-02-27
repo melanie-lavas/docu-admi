@@ -12,7 +12,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { emptyClient, createLineItem, companyInfo, calculateSubtotal, TPS_RATE, TVQ_RATE } from "@/lib/companyInfo";
-import { Printer, ArrowLeft, Save, Share2, FileText, Receipt, ScrollText } from "lucide-react";
+import { generateFullDocumentPdf } from "@/lib/generateDocumentPdf";
+import { ArrowLeft, Save, FileText, Receipt, ScrollText, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -169,13 +170,19 @@ const DocumentsPage = () => {
     }
   };
 
-  const handleShare = async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title: `Document — E.M.J`, url }); return; } catch {}
-    }
-    await navigator.clipboard.writeText(url);
-    toast.success("Lien copié!");
+  const handleDownloadPdf = () => {
+    generateFullDocumentPdf({
+      docType,
+      docNumber,
+      date,
+      client,
+      items,
+      selectedServices,
+      notes,
+      paymentOption,
+      totalPrice,
+    });
+    toast.success("PDF téléchargé!");
   };
 
   const docLabels = {
@@ -198,20 +205,18 @@ const DocumentsPage = () => {
             <Button size="sm" variant="outline" onClick={handleSave} disabled={saving || !selectedClientId} className="gap-1">
               <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
             </Button>
-            <Button size="sm" onClick={() => setShowPreview(true)} className="gap-1">
+            <Button size="sm" variant="outline" onClick={() => setShowPreview(true)} className="gap-1">
               <FileText className="h-4 w-4" /> Aperçu
+            </Button>
+            <Button size="sm" onClick={handleDownloadPdf} className="gap-1">
+              <Download className="h-4 w-4" /> PDF
             </Button>
           </>
         )}
         {showPreview && (
-          <>
-            <Button size="sm" variant="outline" onClick={handleShare} className="gap-1">
-              <Share2 className="h-4 w-4" /> Partager
-            </Button>
-            <Button size="sm" onClick={() => window.print()} className="gap-1">
-              <Printer className="h-4 w-4" /> Imprimer
-            </Button>
-          </>
+          <Button size="sm" onClick={handleDownloadPdf} className="gap-1">
+            <Download className="h-4 w-4" /> Télécharger PDF
+          </Button>
         )}
       </div>
 
