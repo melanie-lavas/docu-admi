@@ -12,7 +12,7 @@ import Contrat from "./pages/Contrat";
 import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
-import Publicite from "./pages/Publicite";
+import DocumentsVierges from "./pages/DocumentsVierges";
 import Depenses from "./pages/Depenses";
 import Agenda from "./pages/Agenda";
 import Auth from "./pages/Auth";
@@ -46,7 +46,7 @@ const ProtectedRoutes = () => {
       <Route path="/courriels" element={<EmailTemplates />} />
       <Route path="/clients" element={<Clients />} />
       <Route path="/run-gazon" element={<RunGazon />} />
-      <Route path="/publicite" element={<Publicite />} />
+      <Route path="/documents-vierges" element={<DocumentsVierges />} />
       <Route path="/depenses" element={<Depenses />} />
       <Route path="/agenda" element={<Agenda />} />
       <Route path="*" element={<NotFound />} />
