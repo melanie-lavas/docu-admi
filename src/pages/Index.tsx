@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Receipt, ScrollText, Mail, Users, Leaf, Megaphone, Wallet, CalendarDays, LogOut } from "lucide-react";
+import { FileText, Mail, Users, Leaf, CalendarDays, LogOut, Printer } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const documentTypes = [
+const sections = [
   {
     title: "Documents",
     description: "Soumission, facture et contrat — tout en un",
@@ -14,10 +14,10 @@ const documentTypes = [
     path: "/documents",
   },
   {
-    title: "Templates Courriel",
-    description: "Réponses pré-faites à copier-coller",
-    icon: Mail,
-    path: "/courriels",
+    title: "Documents vierges",
+    description: "Soumission, facture et contrat vierges à imprimer",
+    icon: Printer,
+    path: "/documents-vierges",
   },
   {
     title: "Gestion Clients",
@@ -32,22 +32,16 @@ const documentTypes = [
     path: "/run-gazon",
   },
   {
-    title: "Dépenses",
-    description: "Suivi des dépenses d'entreprise par catégorie",
-    icon: Wallet,
-    path: "/depenses",
-  },
-  {
     title: "Agenda",
     description: "Rendez-vous, rappels et tâches planifiées",
     icon: CalendarDays,
     path: "/agenda",
   },
   {
-    title: "Publicité IA",
-    description: "Générer textes et images publicitaires avec l'IA",
-    icon: Megaphone,
-    path: "/publicite",
+    title: "Templates Courriel",
+    description: "Réponses pré-faites à copier-coller",
+    icon: Mail,
+    path: "/courriels",
   },
 ];
 
@@ -56,8 +50,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Hero */}
-      <header className="document-header-gradient py-12 px-6 text-center relative">
+      <header className="document-header-gradient py-10 px-6 text-center relative">
         <Button
           size="sm"
           variant="ghost"
@@ -70,39 +63,34 @@ const Index = () => {
         >
           <LogOut className="h-4 w-4 mr-1" /> Déconnexion
         </Button>
-        <img src={logoEmj} alt="Logo E.M.J" className="w-24 h-24 rounded-xl mx-auto mb-4 object-cover shadow-lg" />
-        <h1 className="text-3xl font-display font-bold text-primary-foreground">
+        <img src={logoEmj} alt="Logo E.M.J" className="w-20 h-20 rounded-xl mx-auto mb-3 object-cover shadow-lg" />
+        <h1 className="text-2xl font-display font-bold text-primary-foreground">
           {companyInfo.name}
         </h1>
-        <p className="text-primary-foreground/80 mt-1">{companyInfo.subtitle}</p>
-        <p className="text-primary-foreground/60 text-sm mt-2">
-          Générateur de documents légaux
-        </p>
+        <p className="text-primary-foreground/80 text-sm mt-1">{companyInfo.subtitle}</p>
       </header>
 
-      {/* Document Cards */}
-      <main className="flex-1 max-w-4xl mx-auto w-full p-8">
-        <h2 className="text-lg font-display font-bold text-foreground mb-6">
-          Choisissez une section
+      <main className="flex-1 max-w-3xl mx-auto w-full p-6">
+        <h2 className="text-base font-display font-bold text-foreground mb-4">
+          Gestion de l'entreprise
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {documentTypes.map((doc) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {sections.map((s) => (
             <button
-              key={doc.path}
-              onClick={() => navigate(doc.path)}
-              className="group bg-card border border-border rounded-xl p-6 text-left hover:border-primary hover:shadow-lg transition-all duration-200"
+              key={s.path}
+              onClick={() => navigate(s.path)}
+              className="group bg-card border border-border rounded-xl p-5 text-left hover:border-primary hover:shadow-md transition-all duration-200"
             >
-              <div className="document-header-gradient w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <doc.icon className="h-6 w-6 text-primary-foreground" />
+              <div className="document-header-gradient w-10 h-10 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <s.icon className="h-5 w-5 text-primary-foreground" />
               </div>
-              <h3 className="font-display font-bold text-foreground text-lg mb-1">{doc.title}</h3>
-              <p className="text-sm text-muted-foreground">{doc.description}</p>
+              <h3 className="font-display font-bold text-foreground text-sm mb-0.5">{s.title}</h3>
+              <p className="text-xs text-muted-foreground">{s.description}</p>
             </button>
           ))}
         </div>
 
-        {/* Company Info */}
-        <div className="mt-12 border-t border-border pt-6 text-center text-sm text-muted-foreground">
+        <div className="mt-10 border-t border-border pt-4 text-center text-xs text-muted-foreground">
           <p className="font-semibold text-foreground">{companyInfo.owner}, {companyInfo.title}</p>
           <p>{companyInfo.phone} — {companyInfo.email} — N.E.Q. {companyInfo.neq}</p>
         </div>
