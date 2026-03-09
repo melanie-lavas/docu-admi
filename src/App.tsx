@@ -13,7 +13,7 @@ import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
 import DocumentsVierges from "./pages/DocumentsVierges";
 import Depenses from "./pages/Depenses";
-import Agenda from "./pages/Agenda";
+
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
