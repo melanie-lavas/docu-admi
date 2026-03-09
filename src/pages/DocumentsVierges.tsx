@@ -125,17 +125,35 @@ const BlankDocument = ({ type }: { type: DocType }) => {
           </div>
           <div className="mb-3 text-xs">
             <p className="font-bold uppercase text-gray-600 mb-1">Période du contrat</p>
-            <p>Du _______________ au _______________ — _____ passages assurés.</p>
+            <p className="font-semibold">Du 1er mai 2026 au 15 octobre 2026 — 22 passages assurés.</p>
+            <p className="mt-0.5">Entretien hebdomadaire sauf en cas d'urgence météo.</p>
+          </div>
+          <div className="mb-3 text-xs">
+            <p className="font-bold uppercase text-gray-600 mb-1">Options de paiement</p>
+            <div className="space-y-1">
+              <label className="flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 border border-gray-400 rounded-sm flex-shrink-0" />
+                Option A — Paiement intégral avant le 1er mai 2026
+              </label>
+              <label className="flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 border border-gray-400 rounded-sm flex-shrink-0" />
+                Option B — 2 versements égaux (15 avril 2026 et 15 août 2026)
+              </label>
+            </div>
           </div>
           <div className="mb-3 text-xs">
             <p className="font-bold uppercase text-gray-600 mb-1">Clauses du contrat</p>
             <ol className="list-decimal list-inside space-y-0.5 text-[10px] leading-tight">
               <li>L'entrepreneur se réserve le droit de mettre fin au contrat sans préavis en cas de manque de respect ou de non-paiement.</li>
-              <li>L'entrepreneur n'est pas responsable des conditions météorologiques.</li>
-              <li>Le gazon sera coupé à une hauteur de 3 pouces (1 à 2 passages selon les besoins).</li>
+              <li>L'entrepreneur n'est pas responsable des conditions météorologiques. En cas de pluie pendant trois jours consécutifs ou plus, il fera de son mieux malgré le retard.</li>
+              <li>Le gazon sera coupé à une hauteur de 3,5 pouces (1 à 2 passages selon les besoins).</li>
               <li>Le client dispose de 24 heures après le service pour signaler toute insatisfaction.</li>
               <li>Tout travail additionnel non prévu au contrat fera l'objet d'une soumission séparée.</li>
             </ol>
+          </div>
+          <div className="mb-3 border border-red-200 bg-red-50 rounded p-2 text-[10px]">
+            <p className="font-semibold text-red-600">⚠️ Important</p>
+            <p>Vous devez retourner le contrat signé avant le début des services. Un paiement non fait ou un contrat non signé peut entraîner l'arrêt des services.</p>
           </div>
         </>
       )}
