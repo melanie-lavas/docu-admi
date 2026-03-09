@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
-import Documents from "./pages/Documents";
 import Soumission from "./pages/Soumission";
 import Facture from "./pages/Facture";
 import Contrat from "./pages/Contrat";
