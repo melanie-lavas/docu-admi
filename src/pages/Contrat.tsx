@@ -23,7 +23,7 @@ const ContratPage = () => {
     address: searchParams.get("address") || "",
     city: searchParams.get("city") || "",
     phone: searchParams.get("phone") || "",
-    email: searchParams.get("email") || "",
+    email: searchParams.get("email") || ""
   };
   const [client, setClient] = useState<ClientInfo>(initialClient.name ? initialClient : { ...emptyClient });
   const [docNumber, setDocNumber] = useState("");
@@ -35,7 +35,7 @@ const ContratPage = () => {
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
-      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
+    prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
     );
   };
 
@@ -52,7 +52,7 @@ const ContratPage = () => {
       date: date || null,
       amount: parseFloat(totalPrice) || 0,
       notes: `Option: ${paymentOption || "N/A"} | Services: ${selectedServices.join(", ")}`,
-      status: "actif",
+      status: "actif"
     });
     setSaving(false);
     if (error) {
@@ -81,11 +81,11 @@ const ContratPage = () => {
         <Button size="sm" variant="outline" onClick={() => navigate(-1)} className="gap-1">
           <ArrowLeft className="h-4 w-4" /> Retour
         </Button>
-        {clientId && (
-          <Button size="sm" variant="outline" onClick={handleSave} disabled={saving} className="gap-1">
+        {clientId &&
+        <Button size="sm" variant="outline" onClick={handleSave} disabled={saving} className="gap-1">
             <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
           </Button>
-        )}
+        }
         <Button size="sm" variant="outline" onClick={handleShare} className="gap-1">
           <Share2 className="h-4 w-4" /> Partager
         </Button>
@@ -101,8 +101,8 @@ const ContratPage = () => {
           documentNumber={docNumber}
           date={date}
           onDocNumberChange={setDocNumber}
-          onDateChange={setDate}
-        />
+          onDateChange={setDate} />
+        
 
         <ClientSection client={client} onChange={setClient} />
 
@@ -125,15 +125,15 @@ const ContratPage = () => {
             Services inclus
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {companyInfo.services.map((service) => (
-              <label key={service} className="flex items-center gap-2 text-sm cursor-pointer">
+            {companyInfo.services.map((service) =>
+            <label key={service} className="flex items-center gap-2 text-sm cursor-pointer">
                 <Checkbox
-                  checked={selectedServices.includes(service)}
-                  onCheckedChange={() => toggleService(service)}
-                />
+                checked={selectedServices.includes(service)}
+                onCheckedChange={() => toggleService(service)} />
+              
                 {service}
               </label>
-            ))}
+            )}
           </div>
         </div>
 
@@ -149,8 +149,8 @@ const ContratPage = () => {
               placeholder="0.00"
               className="w-40 text-right"
               type="number"
-              step="0.01"
-            />
+              step="0.01" />
+            
             <span className="text-muted-foreground text-sm">$</span>
           </div>
 
@@ -162,8 +162,8 @@ const ContratPage = () => {
             <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
               <Checkbox
                 checked={paymentOption === "A"}
-                onCheckedChange={() => setPaymentOption(paymentOption === "A" ? "" : "A")}
-              />
+                onCheckedChange={() => setPaymentOption(paymentOption === "A" ? "" : "A")} />
+              
               <div className="text-sm">
                 <span className="font-semibold text-foreground">Option A — Paiement intégral</span>
                 <p className="text-muted-foreground text-xs mt-0.5">Règlement unique avant le 1er mai 2026</p>
@@ -172,8 +172,8 @@ const ContratPage = () => {
             <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
               <Checkbox
                 checked={paymentOption === "B"}
-                onCheckedChange={() => setPaymentOption(paymentOption === "B" ? "" : "B")}
-              />
+                onCheckedChange={() => setPaymentOption(paymentOption === "B" ? "" : "B")} />
+              
               <div className="text-sm">
                 <span className="font-semibold text-foreground">Option B — 2 versements égaux</span>
                 <p className="text-muted-foreground text-xs mt-0.5">1er versement le 15 avril 2026, 2e versement le 15 août 2026</p>
@@ -209,7 +209,7 @@ const ContratPage = () => {
 
         {/* Important Notice */}
         <div className="border border-destructive/30 bg-destructive/5 rounded-lg p-4 mb-6">
-          <p className="text-sm font-semibold text-destructive">⚠️ Important</p>
+          
           <p className="text-xs text-foreground mt-1">
             Vous devez retourner le contrat signé avant le début des services. Un paiement non fait ou un contrat non signé peut entraîner l'arrêt des services.
           </p>
@@ -232,8 +232,8 @@ const ContratPage = () => {
 
         <DocumentFooter />
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default ContratPage;
