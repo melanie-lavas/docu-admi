@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
-import Documents from "./pages/Documents";
 import Soumission from "./pages/Soumission";
 import Facture from "./pages/Facture";
 import Contrat from "./pages/Contrat";
@@ -14,7 +13,7 @@ import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
 import DocumentsVierges from "./pages/DocumentsVierges";
 import Depenses from "./pages/Depenses";
-import Agenda from "./pages/Agenda";
+
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -39,7 +38,6 @@ const ProtectedRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/documents" element={<Documents />} />
       <Route path="/soumission" element={<Soumission />} />
       <Route path="/facture" element={<Facture />} />
       <Route path="/contrat" element={<Contrat />} />
@@ -48,7 +46,6 @@ const ProtectedRoutes = () => {
       <Route path="/run-gazon" element={<RunGazon />} />
       <Route path="/documents-vierges" element={<DocumentsVierges />} />
       <Route path="/depenses" element={<Depenses />} />
-      <Route path="/agenda" element={<Agenda />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FileText, Mail, Users, Leaf, CalendarDays, LogOut, Printer } from "lucide-react";
+import { Mail, Users, Leaf, LogOut, Printer } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,12 +7,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const sections = [
-  {
-    title: "Documents",
-    description: "Soumission, facture et contrat — tout en un",
-    icon: FileText,
-    path: "/documents",
-  },
   {
     title: "Documents vierges",
     description: "Soumission, facture et contrat vierges à imprimer",
@@ -30,12 +24,6 @@ const sections = [
     description: "Liste des clients pour la tonte avec suivi",
     icon: Leaf,
     path: "/run-gazon",
-  },
-  {
-    title: "Agenda",
-    description: "Rendez-vous, rappels et tâches planifiées",
-    icon: CalendarDays,
-    path: "/agenda",
   },
   {
     title: "Templates Courriel",
