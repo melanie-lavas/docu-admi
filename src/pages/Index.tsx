@@ -8,12 +8,6 @@ import { toast } from "sonner";
 
 const sections = [
   {
-    title: "Documents",
-    description: "Soumission, facture et contrat — tout en un",
-    icon: FileText,
-    path: "/documents",
-  },
-  {
     title: "Documents vierges",
     description: "Soumission, facture et contrat vierges à imprimer",
     icon: Printer,
@@ -30,12 +24,6 @@ const sections = [
     description: "Liste des clients pour la tonte avec suivi",
     icon: Leaf,
     path: "/run-gazon",
-  },
-  {
-    title: "Agenda",
-    description: "Rendez-vous, rappels et tâches planifiées",
-    icon: CalendarDays,
-    path: "/agenda",
   },
   {
     title: "Templates Courriel",
