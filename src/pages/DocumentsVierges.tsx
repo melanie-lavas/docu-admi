@@ -158,8 +158,8 @@ const BlankDocument = ({ type }: { type: DocType }) => {
         </>
       )}
 
-      {/* Payment options */}
-      {(type === "facture" || type === "contrat") && (
+      {/* Payment options - facture only (contrat has its own) */}
+      {type === "facture" && (
         <div className="mb-3 text-xs">
           <p className="font-bold uppercase text-gray-600 mb-1">Modalités de paiement</p>
           <div className="space-y-1">
@@ -175,6 +175,15 @@ const BlankDocument = ({ type }: { type: DocType }) => {
               Mode de paiement : Virement Interac au {companyInfo.phone} ou argent comptant.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Payment info for contrat */}
+      {type === "contrat" && (
+        <div className="mb-3 text-xs">
+          <p className="font-bold uppercase text-gray-600 mb-1">Modalités de paiement</p>
+          <p>Mode de paiement : Virement Interac au {companyInfo.phone} ou argent comptant.</p>
+          <p className="text-[10px] text-gray-500 mt-0.5 italic">Veuillez inscrire le numéro de contrat avec chaque paiement.</p>
         </div>
       )}
 
