@@ -13,6 +13,7 @@ import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
 import DocumentsVierges from "./pages/DocumentsVierges";
 import Depenses from "./pages/Depenses";
+import RunGazonPrint from "./pages/RunGazonPrint";
 
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -46,6 +47,7 @@ const ProtectedRoutes = () => {
       <Route path="/run-gazon" element={<RunGazon />} />
       <Route path="/documents-vierges" element={<DocumentsVierges />} />
       <Route path="/depenses" element={<Depenses />} />
+      <Route path="/run-gazon-print" element={<RunGazonPrint />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Mail, Users, Leaf, LogOut, Printer } from "lucide-react";
+import { Mail, Users, Leaf, LogOut, Printer, ClipboardList } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,12 @@ const sections = [
     description: "Liste des clients pour la tonte avec suivi",
     icon: Leaf,
     path: "/run-gazon",
+  },
+  {
+    title: "Feuille de Run (impression)",
+    description: "Feuille vierge avec colonnes à imprimer",
+    icon: ClipboardList,
+    path: "/run-gazon-print",
   },
   {
     title: "Templates Courriel",
