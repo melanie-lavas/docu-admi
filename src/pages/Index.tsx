@@ -26,6 +26,12 @@ const sections = [
     path: "/run-gazon",
   },
   {
+    title: "Feuille de Run (impression)",
+    description: "Feuille vierge avec colonnes à imprimer",
+    icon: ClipboardList,
+    path: "/run-gazon-print",
+  },
+  {
     title: "Templates Courriel",
     description: "Réponses pré-faites à copier-coller",
     icon: Mail,
