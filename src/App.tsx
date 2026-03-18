@@ -47,6 +47,7 @@ const ProtectedRoutes = () => {
       <Route path="/run-gazon" element={<RunGazon />} />
       <Route path="/documents-vierges" element={<DocumentsVierges />} />
       <Route path="/depenses" element={<Depenses />} />
+      <Route path="/run-gazon-print" element={<RunGazonPrint />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
