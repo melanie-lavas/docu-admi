@@ -43,6 +43,12 @@ const sections = [
     icon: ShieldCheck,
     path: "/decharge",
   },
+  {
+    title: "Banque de services",
+    description: "Gérer les services et prix pré-enregistrés",
+    icon: Package,
+    path: "/services",
+  },
 ];
 
 const Index = () => {
