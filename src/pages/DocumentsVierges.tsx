@@ -33,6 +33,16 @@ const DocumentsVierges = () => {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<DocType>("contrat-facture");
 
+  // Saved services from DB
+  const [savedServices, setSavedServices] = useState<{ description: string; unit_price: number }[]>([]);
+  useEffect(() => {
+    const fetchServices = async () => {
+      const { data } = await supabase.from("saved_services").select("description, unit_price").order("description");
+      if (data) setSavedServices(data);
+    };
+    fetchServices();
+  }, []);
+
   // Editable fields
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
@@ -41,7 +51,7 @@ const DocumentsVierges = () => {
   const [clientCity, setClientCity] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [clientEmail, setClientEmail] = useState("");
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedServicesList, setSelectedServicesList] = useState<string[]>([]);
   const [rows, setRows] = useState<LineRow[]>([createRow(), createRow(), createRow(), createRow(), createRow()]);
   const [montantConvenu, setMontantConvenu] = useState("");
   const [paymentOption, setPaymentOption] = useState<"" | "A" | "B">("");
