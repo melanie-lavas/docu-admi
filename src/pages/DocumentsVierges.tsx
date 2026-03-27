@@ -226,7 +226,23 @@ const DocumentsVierges = () => {
                   return (
                     <tr key={r.id} className={i % 2 === 0 ? "bg-gray-50" : ""}>
                       <td className="p-0.5 border border-gray-200">
-                        <Input value={r.description} onChange={(e) => updateRow(r.id, "description", e.target.value)} className="h-6 text-xs px-1 py-0 border-0 bg-transparent" />
+                        <div className="flex gap-0.5">
+                          {savedServices.length > 0 && (
+                            <Select onValueChange={(val) => applyService(r.id, val)}>
+                              <SelectTrigger className="h-6 w-8 px-1 py-0 border-0 bg-transparent text-xs shrink-0 [&>svg]:h-3 [&>svg]:w-3 [&>span]:hidden">
+                                <span className="text-[10px]">📋</span>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {savedServices.map((svc) => (
+                                  <SelectItem key={svc.description} value={svc.description} className="text-xs">
+                                    {svc.description} — {svc.unit_price.toFixed(2)} $
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                          <Input value={r.description} onChange={(e) => updateRow(r.id, "description", e.target.value)} className="h-6 text-xs px-1 py-0 border-0 bg-transparent flex-1" placeholder="Choisir 📋 ou taper..." />
+                        </div>
                       </td>
                       <td className="p-0.5 border border-gray-200">
                         <Input value={r.qty} onChange={(e) => updateRow(r.id, "qty", e.target.value)} className="h-6 text-xs px-1 py-0 border-0 bg-transparent text-center" />
