@@ -35,13 +35,103 @@ const RunGazon = () => {
   const [entries, setEntries] = useState<RunEntry[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) return JSON.parse(saved);
-    // Start with 15 empty rows
     return Array.from({ length: 15 }, () => emptyRow());
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   }, [entries]);
+
+  // Sort entries by city then by street name for logical route order
+  const sortByRoute = () => {
+    setEntries((prev) => {
+      const filled = prev.filter((e) => e.name.trim());
+      const empty = prev.filter((e) => !e.name.trim());
+      
+      filled.sort((a, b) => {
+        // Group by city first
+        const cityCompare = (a.city || "").localeCompare(b.city || "", "fr");
+        if (cityCompare !== 0) return cityCompare;
+        
+        // Then sort by street name (ignore house number)
+        const streetA = (a.address || "").replace(/^\d+\s*/, "");
+        const streetB = (b.address || "").replace(/^\d+\s*/, "");
+        const streetCompare = streetA.localeCompare(streetB, "fr");
+        if (streetCompare !== 0) return streetCompare;
+        
+        // Same street: sort by house number
+        const numA = parseInt((a.address || "").match(/^(\d+)/)?.[1] || "0");
+        const numB = parseInt((b.address || "").match(/^(\d+)/)?.[1] || "0");
+        return numA - numB;
+      });
+      
+      return [...filled, ...empty];
+    });
+    toast.success("Clients triés par trajet logique (ville → rue → numéro)");
+  };
+
+  const loadClients = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .select("name, address, city, phone")
+        .order("city")
+        .order("address");
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        toast.error("Aucun client trouvé");
+        setLoading(false);
+        return;
+      }
+
+      // Check which clients are already in the run (by name)
+      const existingNames = new Set(entries.filter(e => e.name.trim()).map(e => e.name.trim().toLowerCase()));
+      const newClients = data.filter(c => !existingNames.has(c.name.trim().toLowerCase()));
+
+      if (newClients.length === 0) {
+        toast.info("Tous les clients sont déjà dans la run");
+        setLoading(false);
+        return;
+      }
+
+      const clientEntries: RunEntry[] = newClients.map((c) => ({
+        id: crypto.randomUUID(),
+        name: c.name || "",
+        address: c.address || "",
+        city: c.city || "",
+        phone: c.phone || "",
+        done: false,
+        remarks: "",
+      }));
+
+      // Sort by city then street for logical route
+      clientEntries.sort((a, b) => {
+        const cityCompare = a.city.localeCompare(b.city, "fr");
+        if (cityCompare !== 0) return cityCompare;
+        const streetA = a.address.replace(/^\d+\s*/, "");
+        const streetB = b.address.replace(/^\d+\s*/, "");
+        const streetCompare = streetA.localeCompare(streetB, "fr");
+        if (streetCompare !== 0) return streetCompare;
+        const numA = parseInt(a.address.match(/^(\d+)/)?.[1] || "0");
+        const numB = parseInt(b.address.match(/^(\d+)/)?.[1] || "0");
+        return numA - numB;
+      });
+
+      // Keep existing filled entries, remove empty ones, add new clients
+      setEntries((prev) => {
+        const filled = prev.filter((e) => e.name.trim());
+        return [...filled, ...clientEntries, ...Array.from({ length: 3 }, () => emptyRow())];
+      });
+
+      toast.success(`${newClients.length} clients ajoutés et triés par trajet`);
+    } catch (err) {
+      toast.error("Erreur lors du chargement des clients");
+    }
+    setLoading(false);
+  };
 
   const updateEntry = (id: string, field: keyof RunEntry, value: string | boolean) => {
     setEntries((prev) =>
