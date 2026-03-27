@@ -172,6 +172,12 @@ const RunGazon = () => {
       <div className="max-w-6xl mx-auto p-3 sm:p-6">
         {/* Actions */}
         <div className="flex flex-wrap gap-2 mb-4">
+          <Button size="sm" variant="default" onClick={loadClients} disabled={loading} className="gap-1">
+            <Users className="h-3 w-3" /> {loading ? "Chargement..." : "Charger les clients"}
+          </Button>
+          <Button size="sm" variant="outline" onClick={sortByRoute} className="gap-1">
+            <ArrowUpDown className="h-3 w-3" /> Trier par trajet
+          </Button>
           <Button size="sm" variant="outline" onClick={() => addRows(5)} className="gap-1">
             <Plus className="h-3 w-3" /> 5 lignes
           </Button>
