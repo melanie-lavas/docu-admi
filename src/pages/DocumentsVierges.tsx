@@ -1,13 +1,15 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Printer, FileText, Download } from "lucide-react";
 import { companyInfo, calculateSubtotal, TPS_RATE, TVQ_RATE } from "@/lib/companyInfo";
 import { generateFullDocumentPdf } from "@/lib/generateDocumentPdf";
 import { imageToBase64 } from "@/lib/imageToBase64";
+import { supabase } from "@/integrations/supabase/client";
 import logoEmj from "@/assets/logo-emj.png";
 import signatureImg from "@/assets/signature-max.png";
 
