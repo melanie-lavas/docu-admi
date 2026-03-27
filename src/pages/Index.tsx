@@ -37,6 +37,12 @@ const sections = [
     icon: Mail,
     path: "/courriels",
   },
+  {
+    title: "Décharge légale",
+    description: "Formulaire de décharge pour émondage/élagage",
+    icon: ShieldCheck,
+    path: "/decharge",
+  },
 ];
 
 const Index = () => {
