@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Mail, Users, Leaf, LogOut, Printer, ClipboardList, ShieldCheck } from "lucide-react";
+import { Mail, Users, Leaf, LogOut, Printer, ClipboardList, ShieldCheck, Package } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +42,12 @@ const sections = [
     description: "Formulaire de décharge pour émondage/élagage",
     icon: ShieldCheck,
     path: "/decharge",
+  },
+  {
+    title: "Banque de services",
+    description: "Gérer les services et prix pré-enregistrés",
+    icon: Package,
+    path: "/services",
   },
 ];
 

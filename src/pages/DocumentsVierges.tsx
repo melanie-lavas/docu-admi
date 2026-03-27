@@ -319,11 +319,11 @@ const DocumentsVierges = () => {
                 <div className="space-y-1">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <Checkbox checked={paymentOption === "A"} onCheckedChange={() => setPaymentOption(paymentOption === "A" ? "" : "A")} className="h-3 w-3" />
-                    Option A — Paiement intégral avant le 1er mai 2026
+                    Option A — Paiement intégral {total > 0 ? `(${fmt(total)})` : ""} avant le 1er mai 2026
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <Checkbox checked={paymentOption === "B"} onCheckedChange={() => setPaymentOption(paymentOption === "B" ? "" : "B")} className="h-3 w-3" />
-                    Option B — 2 versements égaux (15 avril 2026 et 15 août 2026)
+                    Option B — 2 versements égaux {total > 0 ? `de ${fmt(total / 2)}` : ""} (15 avril 2026 et 15 août 2026)
                   </label>
                 </div>
                 <p className="text-[10px] text-gray-500 mt-1">
@@ -558,8 +558,13 @@ function generateContratFacturePdf(data: ContratFactureData) {
 
   const optA = paymentOption === "A" ? "☑" : "☐";
   const optB = paymentOption === "B" ? "☑" : "☐";
-  pdf.text(`${optA}  Option A — Paiement intégral avant le 1er mai 2026`, margin + 2, y); y += 5;
-  pdf.text(`${optB}  Option B — 2 versements égaux (15 avril 2026 et 15 août 2026)`, margin + 2, y); y += 5;
+  const pdfTotal = (() => {
+    const sub = items.filter(i => i.description.trim()).reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+    return sub + sub * TPS_RATE + sub * TVQ_RATE;
+  })();
+  const halfPdf = pdfTotal / 2;
+  pdf.text(`${optA}  Option A — Paiement intégral${pdfTotal > 0 ? ` (${fmtP(pdfTotal)})` : ""} avant le 1er mai 2026`, margin + 2, y); y += 5;
+  pdf.text(`${optB}  Option B — 2 versements égaux${pdfTotal > 0 ? ` de ${fmtP(halfPdf)}` : ""} (15 avril 2026 et 15 août 2026)`, margin + 2, y); y += 5;
   pdf.setFontSize(8);
   pdf.text(`Mode de paiement : Virement Interac au ${companyInfo.phone} ou argent comptant.`, margin, y); y += 4;
   pdf.setFont("helvetica", "italic");

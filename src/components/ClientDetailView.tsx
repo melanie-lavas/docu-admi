@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, FileText, DollarSign, CalendarCheck, Trash2, Plus, Send, Save, Download } from "lucide-react";
+import { ArrowLeft, FileText, DollarSign, CalendarCheck, Trash2, Plus, Send, Save, Download, CheckCircle } from "lucide-react";
 import { generateDocumentPdf } from "@/lib/generateDocumentPdf";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
@@ -70,40 +70,63 @@ const ClientDetailView = ({
   const [payNotes, setPayNotes] = useState("");
   const [savingPayment, setSavingPayment] = useState(false);
 
+  // Status updates
+  const [updatingContract, setUpdatingContract] = useState(false);
+  const [updatingPayment, setUpdatingPayment] = useState(false);
+
+  const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+  const totalDocAmount = documents.reduce((sum, d) => sum + Number(d.amount || 0), 0);
+
   const saveNotes = async () => {
     setSavingNotes(true);
     const { error } = await supabase.from("clients").update({ notes: notesValue }).eq("id", client.id);
     setSavingNotes(false);
-    if (error) {
-      toast.error("Erreur lors de la sauvegarde");
-    } else {
-      toast.success("Notes sauvegardées");
-      setEditingNotes(false);
-      onRefresh();
-    }
+    if (error) toast.error("Erreur lors de la sauvegarde");
+    else { toast.success("Notes sauvegardées"); setEditingNotes(false); onRefresh(); }
+  };
+
+  const updateContractStatus = async (status: string) => {
+    setUpdatingContract(true);
+    const updates: any = { contract_status: status };
+    if (status === "signe") updates.contract_signed_date = new Date().toISOString().split("T")[0];
+    const { error } = await supabase.from("clients").update(updates).eq("id", client.id);
+    setUpdatingContract(false);
+    if (error) toast.error("Erreur");
+    else { toast.success("Statut du contrat mis à jour"); onRefresh(); }
+  };
+
+  const updatePaymentStatus = async (status: string) => {
+    setUpdatingPayment(true);
+    const { error } = await supabase.from("clients").update({ payment_status: status }).eq("id", client.id);
+    setUpdatingPayment(false);
+    if (error) toast.error("Erreur");
+    else { toast.success("Statut de paiement mis à jour"); onRefresh(); }
   };
 
   const savePayment = async () => {
-    if (!payAmount || parseFloat(payAmount) <= 0) {
-      toast.error("Entrez un montant valide");
-      return;
-    }
+    const amount = parseFloat(payAmount.replace(",", "."));
+    if (!amount || amount <= 0) { toast.error("Entrez un montant valide"); return; }
     setSavingPayment(true);
     const { error } = await supabase.from("client_payments").insert({
       client_id: client.id,
-      amount: parseFloat(payAmount),
+      amount,
       payment_date: payDate,
       method: payMethod,
       notes: payNotes,
     });
     setSavingPayment(false);
-    if (error) {
-      toast.error("Erreur lors de la sauvegarde du paiement");
-    } else {
+    if (error) toast.error("Erreur lors de la sauvegarde du paiement");
+    else {
       toast.success("Paiement enregistré!");
       setShowPaymentForm(false);
-      setPayAmount("");
-      setPayNotes("");
+      setPayAmount(""); setPayNotes("");
+
+      // Auto-update payment status
+      const newTotal = totalPaid + amount;
+      if (totalDocAmount > 0) {
+        if (newTotal >= totalDocAmount) await supabase.from("clients").update({ payment_status: "paye" }).eq("id", client.id);
+        else if (newTotal > 0) await supabase.from("clients").update({ payment_status: "partiel" }).eq("id", client.id);
+      }
       onRefresh();
     }
   };
@@ -111,28 +134,19 @@ const ClientDetailView = ({
   const deletePayment = async (id: string) => {
     const { error } = await supabase.from("client_payments").delete().eq("id", id);
     if (error) toast.error("Erreur");
-    else {
-      toast.success("Paiement supprimé");
-      onRefresh();
-    }
+    else { toast.success("Paiement supprimé"); onRefresh(); }
   };
 
   const deleteDocument = async (id: string) => {
     const { error } = await supabase.from("client_documents").delete().eq("id", id);
     if (error) toast.error("Erreur lors de la suppression");
-    else {
-      toast.success("Document supprimé");
-      onRefresh();
-    }
+    else { toast.success("Document supprimé"); onRefresh(); }
   };
 
   const deleteRun = async (id: string) => {
     const { error } = await supabase.from("client_runs").delete().eq("id", id);
     if (error) toast.error("Erreur lors de la suppression");
-    else {
-      toast.success("Passage supprimé");
-      onRefresh();
-    }
+    else { toast.success("Passage supprimé"); onRefresh(); }
   };
 
   const buildDocParams = () => {
@@ -153,10 +167,7 @@ const ClientDetailView = ({
   };
 
   const sendDocumentByEmail = (doc: ClientDocument) => {
-    if (!client.email) {
-      toast.error("Ce client n'a pas d'adresse courriel");
-      return;
-    }
+    if (!client.email) { toast.error("Ce client n'a pas d'adresse courriel"); return; }
     const docTypeLabel = doc.doc_type === "facture" ? "Facture" : doc.doc_type === "contrat" ? "Contrat" : "Soumission";
     const subject = encodeURIComponent(`${docTypeLabel} ${doc.doc_number ? `#${doc.doc_number}` : ""} — Entretien Maxime Jutras`);
     const body = encodeURIComponent(
@@ -190,13 +201,77 @@ const ClientDetailView = ({
             <div><span className="text-muted-foreground">Tél:</span> {client.phone}</div>
             <div><span className="text-muted-foreground">Courriel:</span> {client.email}</div>
           </div>
-          <div className="flex gap-2 mt-3">
-            <Badge variant={statusColors[client.contract_status || "non_signe"] as any}>
-              Contrat: {statusLabels[client.contract_status || "non_signe"]}
-            </Badge>
-            <Badge variant={statusColors[client.payment_status || "en_attente"] as any}>
-              Paiement: {statusLabels[client.payment_status || "en_attente"]}
-            </Badge>
+
+          {/* Status management */}
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Contract status */}
+              <div>
+                <Label className="text-xs text-muted-foreground font-semibold uppercase">Statut du contrat</Label>
+                <Select
+                  value={client.contract_status || "non_signe"}
+                  onValueChange={updateContractStatus}
+                  disabled={updatingContract}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="non_signe">❌ Non signé</SelectItem>
+                    <SelectItem value="signe">✅ Signé</SelectItem>
+                    <SelectItem value="expire">⏰ Expiré</SelectItem>
+                  </SelectContent>
+                </Select>
+                {client.contract_signed_date && (
+                  <p className="text-xs text-muted-foreground mt-1">Signé le {client.contract_signed_date}</p>
+                )}
+              </div>
+
+              {/* Payment status */}
+              <div>
+                <Label className="text-xs text-muted-foreground font-semibold uppercase">Statut du paiement</Label>
+                <Select
+                  value={client.payment_status || "en_attente"}
+                  onValueChange={updatePaymentStatus}
+                  disabled={updatingPayment}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en_attente">⏳ En attente</SelectItem>
+                    <SelectItem value="partiel">🔶 Partiel</SelectItem>
+                    <SelectItem value="paye">✅ Payé</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Payment summary */}
+            {totalDocAmount > 0 && (
+              <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total facturé:</span>
+                  <span className="font-semibold">{totalDocAmount.toFixed(2)} $</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Total payé:</span>
+                  <span className="font-semibold text-primary">{totalPaid.toFixed(2)} $</span>
+                </div>
+                <div className="flex justify-between text-sm border-t border-border mt-1 pt-1">
+                  <span className="text-muted-foreground">Solde restant:</span>
+                  <span className={`font-bold ${totalDocAmount - totalPaid > 0 ? "text-destructive" : "text-primary"}`}>
+                    {(totalDocAmount - totalPaid).toFixed(2)} $
+                  </span>
+                </div>
+                {/* Installment info */}
+                <div className="mt-2 pt-2 border-t border-border text-xs text-muted-foreground space-y-1">
+                  <p className="font-semibold text-foreground">Options de versement:</p>
+                  <p>• <strong>Option A:</strong> {totalDocAmount.toFixed(2)} $ avant le 1er mai 2026</p>
+                  <p>• <strong>Option B:</strong> 2 × {(totalDocAmount / 2).toFixed(2)} $ (15 avril et 15 août 2026)</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -227,7 +302,7 @@ const ClientDetailView = ({
             />
           ) : (
             <p className="text-sm text-foreground whitespace-pre-wrap">
-              {client.notes || <span className="text-muted-foreground italic">Aucune note. Cliquez Modifier pour ajouter des notes, rendez-vous, dates importantes...</span>}
+              {client.notes || <span className="text-muted-foreground italic">Aucune note.</span>}
             </p>
           )}
         </div>
@@ -272,7 +347,7 @@ const ClientDetailView = ({
                         <Badge variant="outline" className="text-xs">{doc.status}</Badge>
                       </div>
                     </div>
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex gap-2 mt-2 flex-wrap">
                       <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => openDocument(doc)}>
                         <FileText className="h-3 w-3" /> Ouvrir
                       </Button>
@@ -281,7 +356,7 @@ const ClientDetailView = ({
                       </Button>
                       {client.email && (
                         <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => sendDocumentByEmail(doc)}>
-                          <Send className="h-3 w-3" /> Envoyer par courriel
+                          <Send className="h-3 w-3" /> Envoyer
                         </Button>
                       )}
                       <Button size="sm" variant="ghost" className="gap-1 h-7 text-xs text-destructive hover:text-destructive" onClick={() => deleteDocument(doc.id)}>
@@ -307,7 +382,7 @@ const ClientDetailView = ({
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Label className="text-xs text-muted-foreground">Montant ($) *</Label>
-                      <Input type="number" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} placeholder="0.00" className="mt-1" />
+                      <Input value={payAmount} onChange={(e) => setPayAmount(e.target.value)} placeholder="0.00" className="mt-1" />
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">Date *</Label>
@@ -330,6 +405,23 @@ const ClientDetailView = ({
                       <Input value={payNotes} onChange={(e) => setPayNotes(e.target.value)} placeholder="Ex: 1er versement..." className="mt-1" />
                     </div>
                   </div>
+
+                  {/* Quick fill buttons for installments */}
+                  {totalDocAmount > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                      <p className="text-xs text-muted-foreground w-full">Remplir rapidement:</p>
+                      <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => { setPayAmount(totalDocAmount.toFixed(2)); setPayNotes("Paiement intégral"); }}>
+                        Total: {totalDocAmount.toFixed(2)} $
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => { setPayAmount((totalDocAmount / 2).toFixed(2)); setPayNotes("1er versement (1/2)"); setPayDate("2026-04-15"); }}>
+                        1er versement: {(totalDocAmount / 2).toFixed(2)} $
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => { setPayAmount((totalDocAmount / 2).toFixed(2)); setPayNotes("2e versement (2/2)"); setPayDate("2026-08-15"); }}>
+                        2e versement: {(totalDocAmount / 2).toFixed(2)} $
+                      </Button>
+                    </div>
+                  )}
+
                   <div className="flex gap-2">
                     <Button size="sm" onClick={savePayment} disabled={savingPayment}>
                       {savingPayment ? "..." : "Enregistrer"}

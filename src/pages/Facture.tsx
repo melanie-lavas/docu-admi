@@ -128,37 +128,52 @@ const FacturePage = () => {
         <LineItemsTable items={items} onChange={setItems} showTaxes={true} />
 
         {/* Payment info */}
-        <div className="border border-border rounded-lg p-5 mb-6">
-          <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
-            Modalités de paiement
-          </h3>
-          <div className="space-y-3 mb-4">
-            <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
-              <Checkbox
-                checked={paymentOption === "1"}
-                onCheckedChange={() => setPaymentOption(paymentOption === "1" ? "" : "1")}
-              />
-              <div className="text-sm">
-                <span className="font-semibold text-foreground">Option 1 — Paiement intégral</span>
-                <p className="text-muted-foreground text-xs mt-0.5">Paiement en totalité avant le 1er mai 2026</p>
+        {(() => {
+          const subtotal = calculateSubtotal(items);
+          const totalWithTax = subtotal * (1 + TPS_RATE + TVQ_RATE);
+          const halfPayment = totalWithTax / 2;
+          return (
+            <div className="border border-border rounded-lg p-5 mb-6">
+              <h3 className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+                Modalités de paiement
+              </h3>
+              <div className="space-y-3 mb-4">
+                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
+                  <Checkbox
+                    checked={paymentOption === "1"}
+                    onCheckedChange={() => setPaymentOption(paymentOption === "1" ? "" : "1")}
+                  />
+                  <div className="text-sm">
+                    <span className="font-semibold text-foreground">Option 1 — Paiement intégral</span>
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      {totalWithTax > 0 ? `${totalWithTax.toFixed(2)} $` : "Montant total"} avant le 1er mai 2026
+                    </p>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
+                  <Checkbox
+                    checked={paymentOption === "2"}
+                    onCheckedChange={() => setPaymentOption(paymentOption === "2" ? "" : "2")}
+                  />
+                  <div className="text-sm">
+                    <span className="font-semibold text-foreground">Option 2 — 2 versements égaux</span>
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      {totalWithTax > 0 ? (
+                        <>1er versement de <strong>{halfPayment.toFixed(2)} $</strong> le 15 avril 2026 — 2e versement de <strong>{halfPayment.toFixed(2)} $</strong> le 15 août 2026</>
+                      ) : (
+                        "1er versement le 15 avril 2026, 2e versement le 15 août 2026"
+                      )}
+                    </p>
+                  </div>
+                </label>
               </div>
-            </label>
-            <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-colors">
-              <Checkbox
-                checked={paymentOption === "2"}
-                onCheckedChange={() => setPaymentOption(paymentOption === "2" ? "" : "2")}
-              />
-              <div className="text-sm">
-                <span className="font-semibold text-foreground">Option 2 — 2 versements égaux</span>
-                <p className="text-muted-foreground text-xs mt-0.5">1er versement le 15 avril 2026, 2e versement le 15 août 2026</p>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <p><strong className="text-foreground">Mode de paiement :</strong> Virement Interac au 819-293-7675 ou argent comptant</p>
+                <p className="text-xs italic mt-2">Veuillez inscrire le numéro de facture avec chaque paiement.</p>
               </div>
-            </label>
-          </div>
-          <div className="space-y-1 text-sm text-muted-foreground">
-            <p><strong className="text-foreground">Mode de paiement :</strong> Virement Interac au 819-293-7675 ou argent comptant</p>
-            <p className="text-xs italic mt-2">Veuillez inscrire le numéro de facture avec chaque paiement.</p>
-          </div>
-        </div>
+            </div>
+          );
+        })()}
 
         {/* Important Notice */}
         <div className="border border-destructive/30 bg-destructive/5 rounded-lg p-4 mb-6">
