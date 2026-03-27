@@ -51,7 +51,7 @@ const DocumentsVierges = () => {
   const [clientCity, setClientCity] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [clientEmail, setClientEmail] = useState("");
-  const [selectedServicesList, setSelectedServicesList] = useState<string[]>([]);
+  const [selectedServices, setSelectedServices] = selectedServicesList ? [selectedServicesList, setSelectedServicesList] : [[], () => {}];
   const [rows, setRows] = useState<LineRow[]>([createRow(), createRow(), createRow(), createRow(), createRow()]);
   const [montantConvenu, setMontantConvenu] = useState("");
   const [paymentOption, setPaymentOption] = useState<"" | "A" | "B">("");
