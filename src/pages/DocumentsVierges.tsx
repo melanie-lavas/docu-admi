@@ -558,8 +558,13 @@ function generateContratFacturePdf(data: ContratFactureData) {
 
   const optA = paymentOption === "A" ? "☑" : "☐";
   const optB = paymentOption === "B" ? "☑" : "☐";
-  pdf.text(`${optA}  Option A — Paiement intégral avant le 1er mai 2026`, margin + 2, y); y += 5;
-  pdf.text(`${optB}  Option B — 2 versements égaux (15 avril 2026 et 15 août 2026)`, margin + 2, y); y += 5;
+  const pdfTotal = (() => {
+    const sub = items.filter(i => i.description.trim()).reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+    return sub + sub * TPS_RATE + sub * TVQ_RATE;
+  })();
+  const halfPdf = pdfTotal / 2;
+  pdf.text(`${optA}  Option A — Paiement intégral${pdfTotal > 0 ? ` (${fmtP(pdfTotal)})` : ""} avant le 1er mai 2026`, margin + 2, y); y += 5;
+  pdf.text(`${optB}  Option B — 2 versements égaux${pdfTotal > 0 ? ` de ${fmtP(halfPdf)}` : ""} (15 avril 2026 et 15 août 2026)`, margin + 2, y); y += 5;
   pdf.setFontSize(8);
   pdf.text(`Mode de paiement : Virement Interac au ${companyInfo.phone} ou argent comptant.`, margin, y); y += 4;
   pdf.setFont("helvetica", "italic");
