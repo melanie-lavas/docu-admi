@@ -1,13 +1,15 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Printer, FileText, Download } from "lucide-react";
 import { companyInfo, calculateSubtotal, TPS_RATE, TVQ_RATE } from "@/lib/companyInfo";
 import { generateFullDocumentPdf } from "@/lib/generateDocumentPdf";
 import { imageToBase64 } from "@/lib/imageToBase64";
+import { supabase } from "@/integrations/supabase/client";
 import logoEmj from "@/assets/logo-emj.png";
 import signatureImg from "@/assets/signature-max.png";
 
@@ -31,6 +33,16 @@ const DocumentsVierges = () => {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<DocType>("contrat-facture");
 
+  // Saved services from DB
+  const [savedServices, setSavedServices] = useState<{ description: string; unit_price: number }[]>([]);
+  useEffect(() => {
+    const fetchServices = async () => {
+      const { data } = await supabase.from("saved_services").select("description, unit_price").order("description");
+      if (data) setSavedServices(data);
+    };
+    fetchServices();
+  }, []);
+
   // Editable fields
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
@@ -53,6 +65,13 @@ const DocumentsVierges = () => {
 
   const addRow = () => setRows((prev) => [...prev, createRow()]);
   const removeRow = (id: string) => setRows((prev) => prev.filter((r) => r.id !== id));
+
+  const applyService = (rowId: string, serviceDesc: string) => {
+    const svc = savedServices.find((s) => s.description === serviceDesc);
+    if (svc) {
+      setRows((prev) => prev.map((r) => r.id === rowId ? { ...r, description: svc.description, price: svc.unit_price.toString() } : r));
+    }
+  };
 
   const subtotal = rows.reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
   const tps = subtotal * TPS_RATE;
@@ -207,7 +226,23 @@ const DocumentsVierges = () => {
                   return (
                     <tr key={r.id} className={i % 2 === 0 ? "bg-gray-50" : ""}>
                       <td className="p-0.5 border border-gray-200">
-                        <Input value={r.description} onChange={(e) => updateRow(r.id, "description", e.target.value)} className="h-6 text-xs px-1 py-0 border-0 bg-transparent" />
+                        <div className="flex gap-0.5">
+                          {savedServices.length > 0 && (
+                            <Select onValueChange={(val) => applyService(r.id, val)}>
+                              <SelectTrigger className="h-6 w-8 px-1 py-0 border-0 bg-transparent text-xs shrink-0 [&>svg]:h-3 [&>svg]:w-3 [&>span]:hidden">
+                                <span className="text-[10px]">📋</span>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {savedServices.map((svc) => (
+                                  <SelectItem key={svc.description} value={svc.description} className="text-xs">
+                                    {svc.description} — {svc.unit_price.toFixed(2)} $
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                          <Input value={r.description} onChange={(e) => updateRow(r.id, "description", e.target.value)} className="h-6 text-xs px-1 py-0 border-0 bg-transparent flex-1" placeholder="Choisir 📋 ou taper..." />
+                        </div>
                       </td>
                       <td className="p-0.5 border border-gray-200">
                         <Input value={r.qty} onChange={(e) => updateRow(r.id, "qty", e.target.value)} className="h-6 text-xs px-1 py-0 border-0 bg-transparent text-center" />
