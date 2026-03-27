@@ -319,11 +319,11 @@ const DocumentsVierges = () => {
                 <div className="space-y-1">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <Checkbox checked={paymentOption === "A"} onCheckedChange={() => setPaymentOption(paymentOption === "A" ? "" : "A")} className="h-3 w-3" />
-                    Option A — Paiement intégral avant le 1er mai 2026
+                    Option A — Paiement intégral {total > 0 ? `(${fmt(total)})` : ""} avant le 1er mai 2026
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <Checkbox checked={paymentOption === "B"} onCheckedChange={() => setPaymentOption(paymentOption === "B" ? "" : "B")} className="h-3 w-3" />
-                    Option B — 2 versements égaux (15 avril 2026 et 15 août 2026)
+                    Option B — 2 versements égaux {total > 0 ? `de ${fmt(total / 2)}` : ""} (15 avril 2026 et 15 août 2026)
                   </label>
                 </div>
                 <p className="text-[10px] text-gray-500 mt-1">
