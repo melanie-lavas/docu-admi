@@ -66,6 +66,13 @@ const DocumentsVierges = () => {
   const addRow = () => setRows((prev) => [...prev, createRow()]);
   const removeRow = (id: string) => setRows((prev) => prev.filter((r) => r.id !== id));
 
+  const applyService = (rowId: string, serviceDesc: string) => {
+    const svc = savedServices.find((s) => s.description === serviceDesc);
+    if (svc) {
+      setRows((prev) => prev.map((r) => r.id === rowId ? { ...r, description: svc.description, price: svc.unit_price.toString() } : r));
+    }
+  };
+
   const subtotal = rows.reduce((s, r) => s + (parseFloat(r.qty) || 0) * (parseFloat(r.price) || 0), 0);
   const tps = subtotal * TPS_RATE;
   const tvq = subtotal * TVQ_RATE;
