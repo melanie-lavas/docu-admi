@@ -67,7 +67,10 @@ export type Database = {
           doc_number: string | null
           doc_type: string
           id: string
+          line_items: Json | null
           notes: string | null
+          payment_option: string | null
+          selected_services: string[] | null
           status: string | null
         }
         Insert: {
@@ -78,7 +81,10 @@ export type Database = {
           doc_number?: string | null
           doc_type: string
           id?: string
+          line_items?: Json | null
           notes?: string | null
+          payment_option?: string | null
+          selected_services?: string[] | null
           status?: string | null
         }
         Update: {
@@ -89,7 +95,10 @@ export type Database = {
           doc_number?: string | null
           doc_type?: string
           id?: string
+          line_items?: Json | null
           notes?: string | null
+          payment_option?: string | null
+          selected_services?: string[] | null
           status?: string | null
         }
         Relationships: [

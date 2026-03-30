@@ -5,8 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
-import Soumission from "./pages/Soumission";
-import Facture from "./pages/Facture";
 import Contrat from "./pages/Contrat";
 import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
@@ -41,8 +39,7 @@ const ProtectedRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/soumission" element={<Soumission />} />
-      <Route path="/facture" element={<Facture />} />
+      <Route path="/documents-vierges" element={<DocumentsVierges />} />
       <Route path="/contrat" element={<Contrat />} />
       <Route path="/courriels" element={<EmailTemplates />} />
       <Route path="/clients" element={<Clients />} />

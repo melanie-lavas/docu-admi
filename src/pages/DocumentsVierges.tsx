@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Printer, FileText, Download } from "lucide-react";
+import { ArrowLeft, Printer, FileText, Download, Save } from "lucide-react";
 import { companyInfo, calculateSubtotal, TPS_RATE, TVQ_RATE } from "@/lib/companyInfo";
 import { generateFullDocumentPdf } from "@/lib/generateDocumentPdf";
 import { imageToBase64 } from "@/lib/imageToBase64";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import logoEmj from "@/assets/logo-emj.png";
 import signatureImg from "@/assets/signature-max.png";
 
@@ -31,34 +32,94 @@ const createRow = (): LineRow => ({
 
 const DocumentsVierges = () => {
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState<DocType>("contrat-facture");
+  const [searchParams] = useSearchParams();
+  const [selectedType, setSelectedType] = useState<DocType>(
+    (searchParams.get("type") as DocType) === "soumission" ? "soumission" : "contrat-facture"
+  );
+
+  // Load from URL params
+  const clientId = searchParams.get("clientId") || "";
+  const docId = searchParams.get("docId") || "";
+  const convertFrom = searchParams.get("convertFrom") || "";
 
   // Saved services from DB
   const [savedServices, setSavedServices] = useState<{ description: string; unit_price: number }[]>([]);
-  useEffect(() => {
-    const fetchServices = async () => {
-      const { data } = await supabase.from("saved_services").select("description, unit_price").order("description");
-      if (data) setSavedServices(data);
-    };
-    fetchServices();
-  }, []);
+  const [saving, setSaving] = useState(false);
 
   // Editable fields
   const [docNumber, setDocNumber] = useState("");
   const [date, setDate] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [clientAddress, setClientAddress] = useState("");
-  const [clientCity, setClientCity] = useState("");
-  const [clientPhone, setClientPhone] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [clientName, setClientName] = useState(searchParams.get("name") || "");
+  const [clientAddress, setClientAddress] = useState(searchParams.get("address") || "");
+  const [clientCity, setClientCity] = useState(searchParams.get("city") || "");
+  const [clientPhone, setClientPhone] = useState(searchParams.get("phone") || "");
+  const [clientEmail, setClientEmail] = useState(searchParams.get("email") || "");
+  const [selectedServices2, setSelectedServices2] = useState<string[]>([]);
   const [rows, setRows] = useState<LineRow[]>([createRow(), createRow(), createRow(), createRow(), createRow()]);
   const [montantConvenu, setMontantConvenu] = useState("");
   const [paymentOption, setPaymentOption] = useState<"" | "A" | "B">("");
   const [notes, setNotes] = useState("");
 
+  // Load saved services
+  useEffect(() => {
+    supabase.from("saved_services").select("description, unit_price").order("description")
+      .then(({ data }) => { if (data) setSavedServices(data); });
+  }, []);
+
+  // Load existing document if docId provided
+  useEffect(() => {
+    if (!docId) return;
+    const loadDoc = async () => {
+      const { data } = await supabase.from("client_documents").select("*").eq("id", docId).single();
+      if (!data) return;
+
+      setDocNumber(data.doc_number || "");
+      setDate(data.date || "");
+      setNotes(data.notes || "");
+      setPaymentOption((data as any).payment_option === "A" || (data as any).payment_option === "B" ? (data as any).payment_option : "");
+      
+      const services = (data as any).selected_services;
+      if (Array.isArray(services)) setSelectedServices2(services);
+
+      const items = (data as any).line_items;
+      if (Array.isArray(items) && items.length > 0) {
+        setRows(items.map((it: any) => ({
+          id: it.id || crypto.randomUUID(),
+          description: it.description || "",
+          qty: String(it.quantity ?? it.qty ?? "1"),
+          price: String(it.unitPrice ?? it.price ?? ""),
+        })));
+      }
+
+      // Set type based on doc_type
+      if (data.doc_type === "soumission") {
+        // If converting, switch to contrat-facture
+        if (convertFrom === "soumission") {
+          setSelectedType("contrat-facture");
+        } else {
+          setSelectedType("soumission");
+        }
+      } else {
+        setSelectedType("contrat-facture");
+      }
+
+      // Load client info if clientId present
+      if (data.client_id) {
+        const { data: cl } = await supabase.from("clients").select("*").eq("id", data.client_id).single();
+        if (cl) {
+          setClientName(cl.name);
+          setClientAddress(cl.address || "");
+          setClientCity(cl.city || "");
+          setClientPhone(cl.phone || "");
+          setClientEmail(cl.email || "");
+        }
+      }
+    };
+    loadDoc();
+  }, [docId, convertFrom]);
+
   const toggleService = (s: string) =>
-    setSelectedServices((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+    setSelectedServices2((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
 
   const updateRow = (id: string, field: keyof LineRow, value: string) =>
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
@@ -79,6 +140,54 @@ const DocumentsVierges = () => {
   const total = subtotal + tps + tvq;
   const fmt = (n: number) => n.toFixed(2) + " $";
 
+  // Save to database
+  const handleSave = async () => {
+    if (!clientId) {
+      toast.error("Aucun client lié. Ouvrez ce document depuis une fiche client.");
+      return;
+    }
+    setSaving(true);
+    const docType = selectedType === "soumission" ? "soumission" : "contrat-facture";
+    const amount = selectedType === "contrat-facture" ? Math.round(total * 100) / 100 : Math.round(subtotal * 100) / 100;
+    
+    const lineItems = rows.filter(r => r.description.trim()).map(r => ({
+      id: r.id,
+      description: r.description,
+      quantity: parseFloat(r.qty) || 0,
+      unitPrice: parseFloat(r.price) || 0,
+    }));
+
+    const payload = {
+      client_id: clientId,
+      doc_type: docType,
+      doc_number: docNumber,
+      date: date || null,
+      amount,
+      notes,
+      status: "actif",
+      line_items: lineItems,
+      selected_services: selectedServices2,
+      payment_option: paymentOption,
+    };
+
+    let error;
+    if (docId && !convertFrom) {
+      // Update existing
+      ({ error } = await supabase.from("client_documents").update(payload).eq("id", docId));
+    } else {
+      // Insert new
+      ({ error } = await supabase.from("client_documents").insert(payload));
+    }
+
+    setSaving(false);
+    if (error) {
+      toast.error("Erreur lors de la sauvegarde");
+      console.error(error);
+    } else {
+      toast.success(docId && !convertFrom ? "Document mis à jour!" : "Document enregistré!");
+    }
+  };
+
   const handlePrint = () => window.print();
 
   const handlePdf = async () => {
@@ -90,17 +199,13 @@ const DocumentsVierges = () => {
     if (selectedType === "soumission") {
       generateFullDocumentPdf({
         docType: "soumission",
-        docNumber,
-        date,
+        docNumber, date,
         client: { name: clientName, address: clientAddress, city: clientCity, phone: clientPhone, email: clientEmail },
         items: rows.filter((r) => r.description.trim()).map((r) => ({
           id: r.id, description: r.description, quantity: parseFloat(r.qty) || 0, unitPrice: parseFloat(r.price) || 0,
         })),
-        selectedServices,
-        notes,
-        paymentOption: "",
-        logoBase64: logoB64,
-        signatureBase64: sigB64,
+        selectedServices: selectedServices2, notes, paymentOption: "",
+        logoBase64: logoB64, signatureBase64: sigB64,
       });
     } else {
       generateContratFacturePdf({
@@ -109,7 +214,7 @@ const DocumentsVierges = () => {
         items: rows.filter((r) => r.description.trim()).map((r) => ({
           id: r.id, description: r.description, quantity: parseFloat(r.qty) || 0, unitPrice: parseFloat(r.price) || 0,
         })),
-        selectedServices, notes, paymentOption, montantConvenu,
+        selectedServices: selectedServices2, notes, paymentOption, montantConvenu,
         logoBase64: logoB64, signatureBase64: sigB64,
       });
     }
@@ -119,8 +224,8 @@ const DocumentsVierges = () => {
     <div className="min-h-screen bg-background">
       {/* Toolbar */}
       <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2 flex-wrap">
-        <Button size="sm" variant="outline" onClick={() => navigate("/")} className="gap-1">
-          <ArrowLeft className="h-4 w-4" /> Menu
+        <Button size="sm" variant="outline" onClick={() => navigate(-1)} className="gap-1">
+          <ArrowLeft className="h-4 w-4" /> Retour
         </Button>
         <Button size="sm" variant={selectedType === "contrat-facture" ? "default" : "outline"} onClick={() => setSelectedType("contrat-facture")} className="gap-1">
           Contrat & Facture
@@ -128,6 +233,11 @@ const DocumentsVierges = () => {
         <Button size="sm" variant={selectedType === "soumission" ? "default" : "outline"} onClick={() => setSelectedType("soumission")} className="gap-1">
           <FileText className="h-3.5 w-3.5" /> Soumission
         </Button>
+        {clientId && (
+          <Button size="sm" variant="outline" onClick={handleSave} disabled={saving} className="gap-1">
+            <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
+          </Button>
+        )}
         <Button size="sm" variant="outline" onClick={handlePdf} className="gap-1">
           <Download className="h-4 w-4" /> PDF
         </Button>
@@ -200,7 +310,7 @@ const DocumentsVierges = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 text-xs">
               {companyInfo.services.map((s) => (
                 <label key={s} className="flex items-center gap-1.5 cursor-pointer">
-                  <Checkbox checked={selectedServices.includes(s)} onCheckedChange={() => toggleService(s)} className="h-3 w-3" />
+                  <Checkbox checked={selectedServices2.includes(s)} onCheckedChange={() => toggleService(s)} className="h-3 w-3" />
                   <span>{s}</span>
                 </label>
               ))}
@@ -439,12 +549,10 @@ function generateContratFacturePdf(data: ContratFactureData) {
   y += 4; pdf.text(`${companyInfo.email} | NEQ: ${companyInfo.neq}`, tx, y);
   y += 2;
 
-  // Blue line
   pdf.setDrawColor(59, 130, 246); pdf.setLineWidth(0.8);
   pdf.line(margin, y, pageW - margin, y);
   y += 6;
 
-  // Title
   pdf.setFontSize(14); pdf.setFont("helvetica", "bold");
   pdf.text("CONTRAT & FACTURE", margin, y);
   pdf.setFontSize(9); pdf.setFont("helvetica", "normal");
@@ -486,7 +594,6 @@ function generateContratFacturePdf(data: ContratFactureData) {
     pdf.setFontSize(10); pdf.setFont("helvetica", "bold");
     pdf.text("Description des travaux", margin, y); y += 6;
 
-    // Table header
     pdf.setFillColor(59, 130, 246);
     pdf.rect(margin, y, contentW, 7, "F");
     pdf.setTextColor(255); pdf.setFontSize(8); pdf.setFont("helvetica", "bold");
@@ -508,7 +615,6 @@ function generateContratFacturePdf(data: ContratFactureData) {
       y += 6;
     });
 
-    // Totals
     y += 2;
     const sub = calculateSubtotal(validItems);
     const tpsV = sub * TPS_RATE;

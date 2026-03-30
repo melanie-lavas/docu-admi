@@ -8,8 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, FileText, DollarSign, CalendarCheck, Trash2, Plus, Send, Save, Download, CheckCircle } from "lucide-react";
-import { generateDocumentPdf } from "@/lib/generateDocumentPdf";
+import { ArrowLeft, FileText, DollarSign, CalendarCheck, Trash2, Plus, Send, Save, Download, ArrowRightLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -25,15 +24,6 @@ const statusLabels: Record<string, string> = {
   en_attente: "En attente",
   partiel: "Partiel",
   paye: "Payé",
-};
-
-const statusColors: Record<string, string> = {
-  non_signe: "destructive",
-  signe: "default",
-  expire: "secondary",
-  en_attente: "secondary",
-  partiel: "outline",
-  paye: "default",
 };
 
 interface ClientDetailViewProps {
@@ -121,7 +111,6 @@ const ClientDetailView = ({
       setShowPaymentForm(false);
       setPayAmount(""); setPayNotes("");
 
-      // Auto-update payment status
       const newTotal = totalPaid + amount;
       if (totalDocAmount > 0) {
         if (newTotal >= totalDocAmount) await supabase.from("clients").update({ payment_status: "paye" }).eq("id", client.id);
@@ -160,21 +149,51 @@ const ClientDetailView = ({
     }).toString();
   };
 
+  // Open an existing document in DocumentsVierges with its data
   const openDocument = (doc: ClientDocument) => {
-    const params = buildDocParams();
-    const route = doc.doc_type === "facture" ? "/facture" : doc.doc_type === "contrat" ? "/contrat" : "/soumission";
-    navigate(`${route}?${params}`);
+    const params = new URLSearchParams({
+      clientId: client.id,
+      docId: doc.id,
+      name: client.name,
+      address: client.address || "",
+      city: client.city || "",
+      phone: client.phone || "",
+      email: client.email || "",
+    });
+    navigate(`/documents-vierges?${params.toString()}`);
+  };
+
+  // Convert soumission to contrat-facture
+  const convertToContratFacture = (doc: ClientDocument) => {
+    const params = new URLSearchParams({
+      clientId: client.id,
+      docId: doc.id,
+      convertFrom: "soumission",
+      name: client.name,
+      address: client.address || "",
+      city: client.city || "",
+      phone: client.phone || "",
+      email: client.email || "",
+    });
+    navigate(`/documents-vierges?${params.toString()}`);
   };
 
   const sendDocumentByEmail = (doc: ClientDocument) => {
     if (!client.email) { toast.error("Ce client n'a pas d'adresse courriel"); return; }
-    const docTypeLabel = doc.doc_type === "facture" ? "Facture" : doc.doc_type === "contrat" ? "Contrat" : "Soumission";
+    const docTypeLabel = doc.doc_type === "contrat-facture" ? "Contrat & Facture" : doc.doc_type === "facture" ? "Facture" : doc.doc_type === "contrat" ? "Contrat" : "Soumission";
     const subject = encodeURIComponent(`${docTypeLabel} ${doc.doc_number ? `#${doc.doc_number}` : ""} — Entretien Maxime Jutras`);
     const body = encodeURIComponent(
       `Bonjour,\n\nVeuillez trouver ci-joint votre ${docTypeLabel.toLowerCase()}${doc.doc_number ? ` #${doc.doc_number}` : ""}.\n\nMontant: ${Number(doc.amount).toFixed(2)}$\n\nCordialement,\nMaxime Jutras\nEntretien Maxime Jutras\n819-293-7675`
     );
     window.open(`mailto:${client.email}?subject=${subject}&body=${body}`, "_blank");
     toast.success("Ouverture du client courriel...");
+  };
+
+  const docTypeLabel = (dt: string) => {
+    if (dt === "contrat-facture") return "Contrat & Facture";
+    if (dt === "facture") return "Facture";
+    if (dt === "contrat") return "Contrat";
+    return "Soumission";
   };
 
   return (
@@ -205,17 +224,10 @@ const ClientDetailView = ({
           {/* Status management */}
           <div className="mt-4 pt-4 border-t border-border">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Contract status */}
               <div>
                 <Label className="text-xs text-muted-foreground font-semibold uppercase">Statut du contrat</Label>
-                <Select
-                  value={client.contract_status || "non_signe"}
-                  onValueChange={updateContractStatus}
-                  disabled={updatingContract}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
+                <Select value={client.contract_status || "non_signe"} onValueChange={updateContractStatus} disabled={updatingContract}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="non_signe">❌ Non signé</SelectItem>
                     <SelectItem value="signe">✅ Signé</SelectItem>
@@ -226,18 +238,10 @@ const ClientDetailView = ({
                   <p className="text-xs text-muted-foreground mt-1">Signé le {client.contract_signed_date}</p>
                 )}
               </div>
-
-              {/* Payment status */}
               <div>
                 <Label className="text-xs text-muted-foreground font-semibold uppercase">Statut du paiement</Label>
-                <Select
-                  value={client.payment_status || "en_attente"}
-                  onValueChange={updatePaymentStatus}
-                  disabled={updatingPayment}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
+                <Select value={client.payment_status || "en_attente"} onValueChange={updatePaymentStatus} disabled={updatingPayment}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="en_attente">⏳ En attente</SelectItem>
                     <SelectItem value="partiel">🔶 Partiel</SelectItem>
@@ -264,7 +268,6 @@ const ClientDetailView = ({
                     {(totalDocAmount - totalPaid).toFixed(2)} $
                   </span>
                 </div>
-                {/* Installment info */}
                 <div className="mt-2 pt-2 border-t border-border text-xs text-muted-foreground space-y-1">
                   <p className="font-semibold text-foreground">Options de versement:</p>
                   <p>• <strong>Option A:</strong> {totalDocAmount.toFixed(2)} $ avant le 1er mai 2026</p>
@@ -307,16 +310,13 @@ const ClientDetailView = ({
           )}
         </div>
 
-        {/* Quick document creation */}
+        {/* Quick document creation — all go to DocumentsVierges */}
         <div className="flex flex-wrap gap-2 mb-6">
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/soumission?${buildDocParams()}`)}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/documents-vierges?${buildDocParams()}&type=soumission`)}>
             <FileText className="h-3 w-3" /> Créer Soumission
           </Button>
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/facture?${buildDocParams()}`)}>
-            <DollarSign className="h-3 w-3" /> Créer Facture
-          </Button>
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/contrat?${buildDocParams()}`)}>
-            <CalendarCheck className="h-3 w-3" /> Créer Contrat
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/documents-vierges?${buildDocParams()}&type=contrat-facture`)}>
+            <DollarSign className="h-3 w-3" /> Créer Contrat & Facture
           </Button>
         </div>
 
@@ -338,7 +338,7 @@ const ClientDetailView = ({
                   <div key={doc.id} className="border border-border rounded-lg p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="font-semibold capitalize">{doc.doc_type}</span>
+                        <span className="font-semibold">{docTypeLabel(doc.doc_type)}</span>
                         {doc.doc_number && <span className="text-muted-foreground ml-2">#{doc.doc_number}</span>}
                         <span className="text-muted-foreground ml-2">{doc.date}</span>
                       </div>
@@ -351,9 +351,11 @@ const ClientDetailView = ({
                       <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => openDocument(doc)}>
                         <FileText className="h-3 w-3" /> Ouvrir
                       </Button>
-                      <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => generateDocumentPdf(client, doc)}>
-                        <Download className="h-3 w-3" /> PDF
-                      </Button>
+                      {doc.doc_type === "soumission" && (
+                        <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToContratFacture(doc)}>
+                          <ArrowRightLeft className="h-3 w-3" /> Convertir en Contrat & Facture
+                        </Button>
+                      )}
                       {client.email && (
                         <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => sendDocumentByEmail(doc)}>
                           <Send className="h-3 w-3" /> Envoyer
@@ -406,7 +408,7 @@ const ClientDetailView = ({
                     </div>
                   </div>
 
-                  {/* Quick fill buttons for installments */}
+                  {/* Quick fill buttons */}
                   {totalDocAmount > 0 && (
                     <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
                       <p className="text-xs text-muted-foreground w-full">Remplir rapidement:</p>
@@ -462,7 +464,7 @@ const ClientDetailView = ({
             ) : (
               <div className="space-y-2">
                 {runs.map((run) => (
-                   <div key={run.id} className="border border-border rounded-lg p-3 text-sm">
+                  <div key={run.id} className="border border-border rounded-lg p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">{run.run_date}</span>
                       <div className="flex items-center gap-2">
