@@ -29,9 +29,7 @@ const Auth = () => {
       <div className="w-full max-w-sm border border-border rounded-lg p-6 space-y-6 bg-card">
         <div className="text-center space-y-1">
           <h1 className="text-xl font-bold text-foreground">Les Entreprises E.M.J</h1>
-          <p className="text-sm text-muted-foreground">
-            {mode === "login" ? "Connexion" : "Créer un compte"}
-          </p>
+          <p className="text-sm text-muted-foreground">Connexion</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
