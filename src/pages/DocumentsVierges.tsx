@@ -33,7 +33,9 @@ const createRow = (): LineRow => ({
 const DocumentsVierges = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [selectedType, setSelectedType] = useState<DocType>("contrat-facture");
+  const [selectedType, setSelectedType] = useState<DocType>(
+    (searchParams.get("type") as DocType) === "soumission" ? "soumission" : "contrat-facture"
+  );
 
   // Load from URL params
   const clientId = searchParams.get("clientId") || "";
