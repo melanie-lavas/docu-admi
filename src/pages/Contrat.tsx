@@ -201,7 +201,7 @@ const ContratPage = () => {
           <ol className="list-decimal list-inside space-y-1.5 text-xs text-foreground">
             <li>L'entrepreneur se réserve le droit de mettre fin au contrat sans préavis en cas de manque de respect ou de non-paiement.</li>
             <li>L'entrepreneur n'est pas responsable des conditions météorologiques. En cas de pluie pendant trois jours consécutifs ou plus, il fera de son mieux malgré le retard, mais ne pourra être tenu responsable.</li>
-            <li>Le gazon sera coupé à une hauteur de 3 pouces (1 à 2 passages selon les besoins).</li>
+            <li>Le gazon sera coupé à une hauteur de 3,5 pouces (1 à 2 passages selon les besoins).</li>
             <li>Le client dispose de 24 heures après le service ou le passage pour signaler toute insatisfaction ou plainte. Passé ce délai, aucune plainte ne sera prise en considération.</li>
             <li>Tout travail additionnel non prévu au contrat fera l'objet d'une soumission séparée.</li>
           </ol>

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Mail, Users, Leaf, LogOut, Printer, ClipboardList, ShieldCheck, Package, FileCheck, DollarSign, CalendarCheck, Clock } from "lucide-react";
+import { Mail, Users, Leaf, LogOut, ClipboardList, ShieldCheck, Package, FileCheck, DollarSign, CalendarCheck, Clock } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +9,10 @@ import { toast } from "sonner";
 
 const sections = [
   {
-    title: "Documents vierges",
-    description: "Soumission, facture et contrat vierges à imprimer",
-    icon: Printer,
-    path: "/documents-vierges",
+    title: "Contrat à imprimer",
+    description: "Contrat de service complet prêt à signer",
+    icon: FileCheck,
+    path: "/contrat",
   },
   {
     title: "Gestion Clients",
