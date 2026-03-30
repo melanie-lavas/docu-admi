@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Contrat from "./pages/Contrat";
+import Soumission from "./pages/Soumission";
 import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";

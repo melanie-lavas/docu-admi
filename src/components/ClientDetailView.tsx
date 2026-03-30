@@ -149,7 +149,7 @@ const ClientDetailView = ({
     }).toString();
   };
 
-  // Open an existing document in DocumentsVierges with its data
+  // Open an existing document
   const openDocument = (doc: ClientDocument) => {
     const params = new URLSearchParams({
       clientId: client.id,
@@ -160,11 +160,12 @@ const ClientDetailView = ({
       phone: client.phone || "",
       email: client.email || "",
     });
-    navigate(`/documents-vierges?${params.toString()}`);
+    const route = doc.doc_type === "soumission" ? "/soumission" : "/contrat";
+    navigate(`${route}?${params.toString()}`);
   };
 
-  // Convert soumission to contrat-facture
-  const convertToContratFacture = (doc: ClientDocument) => {
+  // Convert soumission to contrat
+  const convertToContrat = (doc: ClientDocument) => {
     const params = new URLSearchParams({
       clientId: client.id,
       docId: doc.id,
@@ -175,7 +176,7 @@ const ClientDetailView = ({
       phone: client.phone || "",
       email: client.email || "",
     });
-    navigate(`/documents-vierges?${params.toString()}`);
+    navigate(`/contrat?${params.toString()}`);
   };
 
   const sendDocumentByEmail = (doc: ClientDocument) => {
