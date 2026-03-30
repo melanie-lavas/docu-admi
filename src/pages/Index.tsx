@@ -9,10 +9,10 @@ import { toast } from "sonner";
 
 const sections = [
   {
-    title: "Documents vierges",
-    description: "Soumission, facture et contrat vierges à imprimer",
-    icon: Printer,
-    path: "/documents-vierges",
+    title: "Contrat à imprimer",
+    description: "Contrat de service complet prêt à signer",
+    icon: FileCheck,
+    path: "/contrat",
   },
   {
     title: "Gestion Clients",
