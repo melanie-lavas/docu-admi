@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Mail, Users, Leaf, LogOut, Printer, ClipboardList, ShieldCheck, Package, FileCheck, DollarSign, CalendarCheck, Clock } from "lucide-react";
+import { Mail, Users, Leaf, LogOut, ClipboardList, ShieldCheck, Package, FileCheck, DollarSign, CalendarCheck, Clock } from "lucide-react";
 import logoEmj from "@/assets/logo-emj.png";
 import { companyInfo } from "@/lib/companyInfo";
 import { supabase } from "@/integrations/supabase/client";

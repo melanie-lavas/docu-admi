@@ -9,7 +9,7 @@ import Contrat from "./pages/Contrat";
 import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
-import DocumentsVierges from "./pages/DocumentsVierges";
+
 import Depenses from "./pages/Depenses";
 import RunGazonPrint from "./pages/RunGazonPrint";
 import Decharge from "./pages/Decharge";
