@@ -39,12 +39,10 @@ const ProtectedRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/documents-vierges" element={<DocumentsVierges />} />
       <Route path="/contrat" element={<Contrat />} />
       <Route path="/courriels" element={<EmailTemplates />} />
       <Route path="/clients" element={<Clients />} />
       <Route path="/run-gazon" element={<RunGazon />} />
-      <Route path="/documents-vierges" element={<DocumentsVierges />} />
       <Route path="/depenses" element={<Depenses />} />
       <Route path="/run-gazon-print" element={<RunGazonPrint />} />
       <Route path="/decharge" element={<Decharge />} />
