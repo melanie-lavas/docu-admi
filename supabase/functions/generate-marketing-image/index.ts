@@ -75,7 +75,7 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("generate-marketing-image error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erreur inconnue" }), {
+    return new Response(JSON.stringify({ error: "Une erreur interne est survenue. Veuillez réessayer." }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

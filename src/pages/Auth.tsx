@@ -42,19 +42,9 @@ const Auth = () => {
           </div>
           <Button type="submit" disabled={loading} className="w-full">
             {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            {mode === "login" ? "Se connecter" : "Créer le compte"}
+            Se connecter
           </Button>
         </form>
-        <p className="text-xs text-center text-muted-foreground">
-          {mode === "login" ? "Pas encore de compte?" : "Déjà un compte?"}{" "}
-          <button
-            type="button"
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            className="text-primary underline"
-          >
-            {mode === "login" ? "S'inscrire" : "Se connecter"}
-          </button>
-        </p>
       </div>
     </div>
   );
