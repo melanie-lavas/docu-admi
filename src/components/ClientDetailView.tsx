@@ -149,7 +149,7 @@ const ClientDetailView = ({
     }).toString();
   };
 
-  // Open an existing document in DocumentsVierges with its data
+  // Open an existing document
   const openDocument = (doc: ClientDocument) => {
     const params = new URLSearchParams({
       clientId: client.id,
@@ -160,11 +160,12 @@ const ClientDetailView = ({
       phone: client.phone || "",
       email: client.email || "",
     });
-    navigate(`/documents-vierges?${params.toString()}`);
+    const route = doc.doc_type === "soumission" ? "/soumission" : "/contrat";
+    navigate(`${route}?${params.toString()}`);
   };
 
-  // Convert soumission to contrat-facture
-  const convertToContratFacture = (doc: ClientDocument) => {
+  // Convert soumission to contrat
+  const convertToContrat = (doc: ClientDocument) => {
     const params = new URLSearchParams({
       clientId: client.id,
       docId: doc.id,
@@ -175,7 +176,7 @@ const ClientDetailView = ({
       phone: client.phone || "",
       email: client.email || "",
     });
-    navigate(`/documents-vierges?${params.toString()}`);
+    navigate(`/contrat?${params.toString()}`);
   };
 
   const sendDocumentByEmail = (doc: ClientDocument) => {
@@ -310,13 +311,13 @@ const ClientDetailView = ({
           )}
         </div>
 
-        {/* Quick document creation — all go to DocumentsVierges */}
+        {/* Quick document creation */}
         <div className="flex flex-wrap gap-2 mb-6">
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/documents-vierges?${buildDocParams()}&type=soumission`)}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/soumission?${buildDocParams()}`)}>
             <FileText className="h-3 w-3" /> Créer Soumission
           </Button>
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/documents-vierges?${buildDocParams()}&type=contrat-facture`)}>
-            <DollarSign className="h-3 w-3" /> Créer Contrat & Facture
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/contrat?${buildDocParams()}`)}>
+            <DollarSign className="h-3 w-3" /> Créer Contrat
           </Button>
         </div>
 
@@ -352,8 +353,8 @@ const ClientDetailView = ({
                         <FileText className="h-3 w-3" /> Ouvrir
                       </Button>
                       {doc.doc_type === "soumission" && (
-                        <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToContratFacture(doc)}>
-                          <ArrowRightLeft className="h-3 w-3" /> Convertir en Contrat & Facture
+                        <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToContrat(doc)}>
+                          <ArrowRightLeft className="h-3 w-3" /> Convertir en Contrat
                         </Button>
                       )}
                       {client.email && (

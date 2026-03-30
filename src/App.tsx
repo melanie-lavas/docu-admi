@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Contrat from "./pages/Contrat";
+import Soumission from "./pages/Soumission";
 import EmailTemplates from "./pages/EmailTemplates";
 import Clients from "./pages/Clients";
 import RunGazon from "./pages/RunGazon";
@@ -40,6 +41,7 @@ const ProtectedRoutes = () => {
     <Routes>
       <Route path="/" element={<Index />} />
       <Route path="/contrat" element={<Contrat />} />
+      <Route path="/soumission" element={<Soumission />} />
       <Route path="/courriels" element={<EmailTemplates />} />
       <Route path="/clients" element={<Clients />} />
       <Route path="/run-gazon" element={<RunGazon />} />
