@@ -310,13 +310,13 @@ const ClientDetailView = ({
           )}
         </div>
 
-        {/* Quick document creation — all go to DocumentsVierges */}
+        {/* Quick document creation */}
         <div className="flex flex-wrap gap-2 mb-6">
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/documents-vierges?${buildDocParams()}&type=soumission`)}>
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/soumission?${buildDocParams()}`)}>
             <FileText className="h-3 w-3" /> Créer Soumission
           </Button>
-          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/documents-vierges?${buildDocParams()}&type=contrat-facture`)}>
-            <DollarSign className="h-3 w-3" /> Créer Contrat & Facture
+          <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/contrat?${buildDocParams()}`)}>
+            <DollarSign className="h-3 w-3" /> Créer Contrat
           </Button>
         </div>
 
