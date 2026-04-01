@@ -160,7 +160,7 @@ const ClientDetailView = ({
       phone: client.phone || "",
       email: client.email || "",
     });
-    const route = doc.doc_type === "soumission" ? "/soumission" : "/contrat";
+    const route = doc.doc_type === "soumission" ? "/soumission" : doc.doc_type === "facture" ? "/facture" : "/contrat";
     navigate(`${route}?${params.toString()}`);
   };
 
