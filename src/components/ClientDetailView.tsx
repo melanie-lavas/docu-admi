@@ -376,9 +376,14 @@ const ClientDetailView = ({
                         <FileText className="h-3 w-3" /> Ouvrir
                       </Button>
                       {doc.doc_type === "soumission" && (
-                        <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToContrat(doc)}>
-                          <ArrowRightLeft className="h-3 w-3" /> Convertir en Contrat
-                        </Button>
+                        <>
+                          <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToContrat(doc)}>
+                            <ArrowRightLeft className="h-3 w-3" /> → Contrat
+                          </Button>
+                          <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToFacture(doc)}>
+                            <ArrowRightLeft className="h-3 w-3" /> → Facture
+                          </Button>
+                        </>
                       )}
                       {client.email && (
                         <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => sendDocumentByEmail(doc)}>
