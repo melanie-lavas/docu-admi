@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { ClientInfo } from "@/lib/companyInfo";
 import signatureImg from "@/assets/signature-max.png";
+import { useAutoDocNumber } from "@/hooks/useAutoDocNumber";
 
 const ContratPage = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const ContratPage = () => {
   };
   const [client, setClient] = useState<ClientInfo>(initialClient.name ? initialClient : { ...emptyClient });
   const [docNumber, setDocNumber] = useState(baseNumber ? `C-${baseNumber}` : "");
+  useAutoDocNumber("contrat", docId, baseNumber ? docNumber : "", setDocNumber);
   const [date, setDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [totalPrice, setTotalPrice] = useState("");
