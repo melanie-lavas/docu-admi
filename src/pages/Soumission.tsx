@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DocumentHeader from "@/components/DocumentHeader";
 import ClientSection from "@/components/ClientSection";
 import LineItemsTable from "@/components/LineItemsTable";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { emptyClient, createLineItem, companyInfo, calculateSubtotal } from "@/lib/companyInfo";
-import { Printer, ArrowLeft, Save, Share2 } from "lucide-react";
+import { Printer, ArrowLeft, Save, Share2, ArrowRightLeft } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ const SoumissionPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get("clientId") || "";
+  const docId = searchParams.get("docId") || "";
   const initialClient: ClientInfo = {
     name: searchParams.get("name") || "",
     address: searchParams.get("address") || "",
@@ -34,6 +35,28 @@ const SoumissionPage = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [existingDocId, setExistingDocId] = useState(docId);
+
+  // Load existing document data
+  useEffect(() => {
+    if (!docId) return;
+    const load = async () => {
+      const { data, error } = await supabase
+        .from("client_documents")
+        .select("*")
+        .eq("id", docId)
+        .single();
+      if (error || !data) return;
+      setDocNumber(data.doc_number || "");
+      setDate(data.date || "");
+      setNotes(data.notes || "");
+      setSelectedServices(data.selected_services || []);
+      if (data.line_items && Array.isArray(data.line_items) && (data.line_items as any[]).length > 0) {
+        setItems(data.line_items as unknown as LineItem[]);
+      }
+    };
+    load();
+  }, [docId]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -57,15 +80,26 @@ const SoumissionPage = () => {
     }
     setSaving(true);
     const amount = calculateSubtotal(items);
-    const { error } = await supabase.from("client_documents").insert({
+    const docData = {
       client_id: clientId,
-      doc_type: "soumission",
+      doc_type: "soumission" as const,
       doc_number: docNumber,
       date: date || null,
       amount,
       notes,
+      selected_services: selectedServices,
+      line_items: items as unknown as Record<string, unknown>[],
       status: "actif",
-    });
+    };
+
+    let error;
+    if (existingDocId) {
+      ({ error } = await supabase.from("client_documents").update(docData).eq("id", existingDocId));
+    } else {
+      const result = await supabase.from("client_documents").insert(docData).select("id").single();
+      error = result.error;
+      if (result.data) setExistingDocId(result.data.id);
+    }
     setSaving(false);
     if (error) {
       toast.error("Erreur lors de la sauvegarde");
@@ -74,10 +108,46 @@ const SoumissionPage = () => {
     }
   };
 
+  const convertToContrat = () => {
+    const params = new URLSearchParams({
+      clientId,
+      convertFrom: "soumission",
+      name: client.name,
+      address: client.address || "",
+      city: client.city || "",
+      phone: client.phone || "",
+      email: client.email || "",
+      baseNumber: docNumber.replace(/^S-?/i, ""),
+      amount: String(calculateSubtotal(items)),
+      services: JSON.stringify(selectedServices),
+      lineItems: JSON.stringify(items),
+    });
+    if (existingDocId) params.set("sourceDocId", existingDocId);
+    navigate(`/contrat?${params.toString()}`);
+  };
+
+  const convertToFacture = () => {
+    const params = new URLSearchParams({
+      clientId,
+      convertFrom: "soumission",
+      name: client.name,
+      address: client.address || "",
+      city: client.city || "",
+      phone: client.phone || "",
+      email: client.email || "",
+      baseNumber: docNumber.replace(/^S-?/i, ""),
+      amount: String(calculateSubtotal(items)),
+      services: JSON.stringify(selectedServices),
+      lineItems: JSON.stringify(items),
+    });
+    if (existingDocId) params.set("sourceDocId", existingDocId);
+    navigate(`/facture?${params.toString()}`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Toolbar */}
-      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2">
+      <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2 flex-wrap">
         <Button size="sm" variant="outline" onClick={() => navigate(-1)} className="gap-1">
           <ArrowLeft className="h-4 w-4" /> Retour
         </Button>
@@ -85,6 +155,16 @@ const SoumissionPage = () => {
           <Button size="sm" variant="outline" onClick={handleSave} disabled={saving} className="gap-1">
             <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
           </Button>
+        )}
+        {clientId && (
+          <>
+            <Button size="sm" variant="outline" onClick={convertToContrat} className="gap-1">
+              <ArrowRightLeft className="h-3 w-3" /> → Contrat
+            </Button>
+            <Button size="sm" variant="outline" onClick={convertToFacture} className="gap-1">
+              <ArrowRightLeft className="h-3 w-3" /> → Facture
+            </Button>
+          </>
         )}
         <Button size="sm" variant="outline" onClick={handleShare} className="gap-1">
           <Share2 className="h-4 w-4" /> Partager
