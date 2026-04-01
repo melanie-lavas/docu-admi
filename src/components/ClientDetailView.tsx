@@ -166,17 +166,40 @@ const ClientDetailView = ({
 
   // Convert soumission to contrat
   const convertToContrat = (doc: ClientDocument) => {
+    const baseNum = (doc.doc_number || "").replace(/^S-?/i, "");
     const params = new URLSearchParams({
       clientId: client.id,
-      docId: doc.id,
       convertFrom: "soumission",
       name: client.name,
       address: client.address || "",
       city: client.city || "",
       phone: client.phone || "",
       email: client.email || "",
+      baseNumber: baseNum,
+      amount: String(doc.amount || 0),
+      services: JSON.stringify(doc.selected_services || []),
     });
+    params.set("sourceDocId", doc.id);
     navigate(`/contrat?${params.toString()}`);
+  };
+
+  const convertToFacture = (doc: ClientDocument) => {
+    const baseNum = (doc.doc_number || "").replace(/^S-?/i, "");
+    const params = new URLSearchParams({
+      clientId: client.id,
+      convertFrom: "soumission",
+      name: client.name,
+      address: client.address || "",
+      city: client.city || "",
+      phone: client.phone || "",
+      email: client.email || "",
+      baseNumber: baseNum,
+      amount: String(doc.amount || 0),
+      services: JSON.stringify(doc.selected_services || []),
+      lineItems: JSON.stringify(doc.line_items || []),
+    });
+    params.set("sourceDocId", doc.id);
+    navigate(`/facture?${params.toString()}`);
   };
 
   const sendDocumentByEmail = (doc: ClientDocument) => {
