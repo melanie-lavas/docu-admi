@@ -88,7 +88,7 @@ const SoumissionPage = () => {
       amount,
       notes,
       selected_services: selectedServices,
-      line_items: items as unknown as Record<string, unknown>[],
+      line_items: JSON.parse(JSON.stringify(items)),
       status: "actif",
     };
 

@@ -111,7 +111,7 @@ const FacturePage = () => {
       notes,
       selected_services: selectedServices,
       payment_option: paymentOption,
-      line_items: items as unknown as Record<string, unknown>[],
+      line_items: JSON.parse(JSON.stringify(items)),
       status: "actif",
     };
 
