@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { ClientInfo, LineItem } from "@/lib/companyInfo";
 import signatureImg from "@/assets/signature-max.png";
+import { useAutoDocNumber } from "@/hooks/useAutoDocNumber";
 
 const SoumissionPage = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const SoumissionPage = () => {
   const [client, setClient] = useState<ClientInfo>(initialClient.name ? initialClient : { ...emptyClient });
   const [items, setItems] = useState<LineItem[]>([createLineItem()]);
   const [docNumber, setDocNumber] = useState("");
+  useAutoDocNumber("soumission", docId, docNumber, setDocNumber);
   const [date, setDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
