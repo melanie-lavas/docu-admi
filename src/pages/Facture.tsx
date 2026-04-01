@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DocumentHeader from "@/components/DocumentHeader";
 import ClientSection from "@/components/ClientSection";
 import LineItemsTable from "@/components/LineItemsTable";
@@ -20,6 +20,9 @@ const FacturePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get("clientId") || "";
+  const docId = searchParams.get("docId") || "";
+  const convertFrom = searchParams.get("convertFrom") || "";
+  const baseNumber = searchParams.get("baseNumber") || "";
   const initialClient: ClientInfo = {
     name: searchParams.get("name") || "",
     address: searchParams.get("address") || "",
@@ -29,12 +32,52 @@ const FacturePage = () => {
   };
   const [client, setClient] = useState<ClientInfo>(initialClient.name ? initialClient : { ...emptyClient });
   const [items, setItems] = useState<LineItem[]>([createLineItem()]);
-  const [docNumber, setDocNumber] = useState("");
+  const [docNumber, setDocNumber] = useState(baseNumber ? `F-${baseNumber}` : "");
   const [date, setDate] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
   const [paymentOption, setPaymentOption] = useState<"" | "1" | "2">("");
   const [saving, setSaving] = useState(false);
+  const [existingDocId, setExistingDocId] = useState(docId);
+
+  // Load from conversion params
+  useEffect(() => {
+    if (convertFrom === "soumission") {
+      const servicesParam = searchParams.get("services");
+      const lineItemsParam = searchParams.get("lineItems");
+      if (servicesParam) {
+        try { setSelectedServices(JSON.parse(servicesParam)); } catch {}
+      }
+      if (lineItemsParam) {
+        try {
+          const parsed = JSON.parse(lineItemsParam);
+          if (Array.isArray(parsed) && parsed.length > 0) setItems(parsed);
+        } catch {}
+      }
+    }
+  }, [convertFrom, searchParams]);
+
+  // Load existing document
+  useEffect(() => {
+    if (!docId) return;
+    const load = async () => {
+      const { data, error } = await supabase
+        .from("client_documents")
+        .select("*")
+        .eq("id", docId)
+        .single();
+      if (error || !data) return;
+      setDocNumber(data.doc_number || "");
+      setDate(data.date || "");
+      setNotes(data.notes || "");
+      setSelectedServices(data.selected_services || []);
+      if (data.payment_option) setPaymentOption(data.payment_option as "" | "1" | "2");
+      if (data.line_items && Array.isArray(data.line_items) && (data.line_items as any[]).length > 0) {
+        setItems(data.line_items as unknown as LineItem[]);
+      }
+    };
+    load();
+  }, [docId]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -59,15 +102,27 @@ const FacturePage = () => {
     setSaving(true);
     const subtotal = calculateSubtotal(items);
     const amount = subtotal * (1 + TPS_RATE + TVQ_RATE);
-    const { error } = await supabase.from("client_documents").insert({
+    const docData = {
       client_id: clientId,
-      doc_type: "facture",
+      doc_type: "facture" as const,
       doc_number: docNumber,
       date: date || null,
       amount: Math.round(amount * 100) / 100,
       notes,
+      selected_services: selectedServices,
+      payment_option: paymentOption,
+      line_items: JSON.parse(JSON.stringify(items)),
       status: "actif",
-    });
+    };
+
+    let error;
+    if (existingDocId && !convertFrom) {
+      ({ error } = await supabase.from("client_documents").update(docData).eq("id", existingDocId));
+    } else {
+      const result = await supabase.from("client_documents").insert(docData).select("id").single();
+      error = result.error;
+      if (result.data) setExistingDocId(result.data.id);
+    }
     setSaving(false);
     if (error) {
       toast.error("Erreur lors de la sauvegarde");

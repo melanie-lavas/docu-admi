@@ -160,23 +160,46 @@ const ClientDetailView = ({
       phone: client.phone || "",
       email: client.email || "",
     });
-    const route = doc.doc_type === "soumission" ? "/soumission" : "/contrat";
+    const route = doc.doc_type === "soumission" ? "/soumission" : doc.doc_type === "facture" ? "/facture" : "/contrat";
     navigate(`${route}?${params.toString()}`);
   };
 
   // Convert soumission to contrat
   const convertToContrat = (doc: ClientDocument) => {
+    const baseNum = (doc.doc_number || "").replace(/^S-?/i, "");
     const params = new URLSearchParams({
       clientId: client.id,
-      docId: doc.id,
       convertFrom: "soumission",
       name: client.name,
       address: client.address || "",
       city: client.city || "",
       phone: client.phone || "",
       email: client.email || "",
+      baseNumber: baseNum,
+      amount: String(doc.amount || 0),
+      services: JSON.stringify(doc.selected_services || []),
     });
+    params.set("sourceDocId", doc.id);
     navigate(`/contrat?${params.toString()}`);
+  };
+
+  const convertToFacture = (doc: ClientDocument) => {
+    const baseNum = (doc.doc_number || "").replace(/^S-?/i, "");
+    const params = new URLSearchParams({
+      clientId: client.id,
+      convertFrom: "soumission",
+      name: client.name,
+      address: client.address || "",
+      city: client.city || "",
+      phone: client.phone || "",
+      email: client.email || "",
+      baseNumber: baseNum,
+      amount: String(doc.amount || 0),
+      services: JSON.stringify(doc.selected_services || []),
+      lineItems: JSON.stringify(doc.line_items || []),
+    });
+    params.set("sourceDocId", doc.id);
+    navigate(`/facture?${params.toString()}`);
   };
 
   const sendDocumentByEmail = (doc: ClientDocument) => {
@@ -353,9 +376,14 @@ const ClientDetailView = ({
                         <FileText className="h-3 w-3" /> Ouvrir
                       </Button>
                       {doc.doc_type === "soumission" && (
-                        <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToContrat(doc)}>
-                          <ArrowRightLeft className="h-3 w-3" /> Convertir en Contrat
-                        </Button>
+                        <>
+                          <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToContrat(doc)}>
+                            <ArrowRightLeft className="h-3 w-3" /> → Contrat
+                          </Button>
+                          <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => convertToFacture(doc)}>
+                            <ArrowRightLeft className="h-3 w-3" /> → Facture
+                          </Button>
+                        </>
                       )}
                       {client.email && (
                         <Button size="sm" variant="outline" className="gap-1 h-7 text-xs" onClick={() => sendDocumentByEmail(doc)}>
