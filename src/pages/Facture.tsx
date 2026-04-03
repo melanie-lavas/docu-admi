@@ -87,6 +87,15 @@ const FacturePage = () => {
     load();
   }, [docId]);
 
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`Facture ${docNumber || ""} — Les Entreprises E.M.J`);
+    const body = encodeURIComponent(
+      `Bonjour ${client.name || "[Nom du client]"},\n\nVeuillez trouver ci-joint la facture ${docNumber ? `#${docNumber}` : ""} pour les services rendus.\n\nMode de paiement : Virement Interac au 819-293-7675 ou argent comptant.\nVeuillez inscrire le numéro de facture avec chaque paiement.\n\nMerci de votre confiance!\n\nCordialement,\nMaxime Jutras\nLes Entreprises E.M.J\n819-293-7675`
+    );
+    const to = client.email || "";
+    window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+  };
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
