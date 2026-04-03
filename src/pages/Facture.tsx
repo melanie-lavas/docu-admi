@@ -9,7 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { emptyClient, createLineItem, companyInfo, calculateSubtotal, TPS_RATE, TVQ_RATE } from "@/lib/companyInfo";
-import { Printer, ArrowLeft, Save, Share2 } from "lucide-react";
+import { Printer, ArrowLeft, Save, Share2, Mail, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -81,6 +87,15 @@ const FacturePage = () => {
     load();
   }, [docId]);
 
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`Facture ${docNumber || ""} — Les Entreprises E.M.J`);
+    const body = encodeURIComponent(
+      `Bonjour ${client.name || "[Nom du client]"},\n\nVeuillez trouver ci-joint la facture ${docNumber ? `#${docNumber}` : ""} pour les services rendus.\n\nMode de paiement : Virement Interac au 819-293-7675 ou argent comptant.\nVeuillez inscrire le numéro de facture avec chaque paiement.\n\nMerci de votre confiance!\n\nCordialement,\nMaxime Jutras\nLes Entreprises E.M.J\n819-293-7675`
+    );
+    const to = client.email || "";
+    window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+  };
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
@@ -138,19 +153,31 @@ const FacturePage = () => {
       {/* Toolbar */}
       <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2">
         <Button size="sm" variant="outline" onClick={() => navigate(-1)} className="gap-1">
-          <ArrowLeft className="h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Retour</span>
         </Button>
         {clientId && (
           <Button size="sm" variant="outline" onClick={handleSave} disabled={saving} className="gap-1">
-            <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
+            <Save className="h-4 w-4" /> <span className="hidden sm:inline">{saving ? "..." : "Enregistrer"}</span>
           </Button>
         )}
-        <Button size="sm" variant="outline" onClick={handleShare} className="gap-1">
-          <Share2 className="h-4 w-4" /> Partager
+        <Button size="sm" variant="outline" onClick={handleEmail} className="gap-1">
+          <Mail className="h-4 w-4" /> <span className="hidden sm:inline">Courriel</span>
         </Button>
         <Button size="sm" onClick={() => window.print()} className="gap-1">
-          <Printer className="h-4 w-4" /> Imprimer
+          <Printer className="h-4 w-4" /> <span className="hidden sm:inline">Imprimer</span>
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="outline" className="gap-1">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleShare}>
+              <Share2 className="h-4 w-4 mr-2" /> Partager
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Document */}
