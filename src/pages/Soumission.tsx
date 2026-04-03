@@ -9,7 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { emptyClient, createLineItem, companyInfo, calculateSubtotal } from "@/lib/companyInfo";
-import { Printer, ArrowLeft, Save, Share2, ArrowRightLeft } from "lucide-react";
+import { Printer, ArrowLeft, Save, Share2, ArrowRightLeft, Mail, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
