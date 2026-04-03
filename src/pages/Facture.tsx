@@ -153,19 +153,31 @@ const FacturePage = () => {
       {/* Toolbar */}
       <div className="no-print sticky top-0 z-10 bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2">
         <Button size="sm" variant="outline" onClick={() => navigate(-1)} className="gap-1">
-          <ArrowLeft className="h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Retour</span>
         </Button>
         {clientId && (
           <Button size="sm" variant="outline" onClick={handleSave} disabled={saving} className="gap-1">
-            <Save className="h-4 w-4" /> {saving ? "..." : "Enregistrer"}
+            <Save className="h-4 w-4" /> <span className="hidden sm:inline">{saving ? "..." : "Enregistrer"}</span>
           </Button>
         )}
-        <Button size="sm" variant="outline" onClick={handleShare} className="gap-1">
-          <Share2 className="h-4 w-4" /> Partager
+        <Button size="sm" variant="outline" onClick={handleEmail} className="gap-1">
+          <Mail className="h-4 w-4" /> <span className="hidden sm:inline">Courriel</span>
         </Button>
         <Button size="sm" onClick={() => window.print()} className="gap-1">
-          <Printer className="h-4 w-4" /> Imprimer
+          <Printer className="h-4 w-4" /> <span className="hidden sm:inline">Imprimer</span>
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="outline" className="gap-1">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleShare}>
+              <Share2 className="h-4 w-4 mr-2" /> Partager
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Document */}
