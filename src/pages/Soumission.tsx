@@ -66,6 +66,15 @@ const SoumissionPage = () => {
     load();
   }, [docId]);
 
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`Soumission ${docNumber || ""} — Les Entreprises E.M.J`);
+    const body = encodeURIComponent(
+      `Bonjour ${client.name || "[Nom du client]"},\n\nMerci de votre intérêt pour nos services d'entretien paysager.\n\nVous trouverez ci-joint notre soumission détaillée pour les services discutés. N'hésitez pas à nous contacter si vous avez des questions ou si vous souhaitez apporter des modifications.\n\nLa soumission est valide pour une durée de 30 jours.\n\nAu plaisir de travailler avec vous!\n\nCordialement,\nMaxime Jutras\nLes Entreprises E.M.J\n819-293-7675`
+    );
+    const to = client.email || "";
+    window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+  };
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
